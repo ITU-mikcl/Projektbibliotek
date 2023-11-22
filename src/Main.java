@@ -27,8 +27,11 @@ public class Main {
         ArrayList<String> fileValues = new ArrayList<>();
 
         try {
+            //Henter og læser filerne fra opgaven
             //File myFile = new File("./src/Tema 1/input-filer/t1-1a.txt");
-            File myFile = new File("./src/Tema 1/input-filer/t1-1b.txt");
+            //File myFile = new File("./src/Tema 1/input-filer/t1-1b.txt");
+            //File myFile = new File("./src/Tema 1/input-filer/t1-1c.txt");
+            File myFile = new File("./src/Tema 1/input-filer/t1-1d.txt");
             Scanner reader = new Scanner(myFile);
 
             while (reader.hasNextLine()) {
@@ -38,47 +41,46 @@ public class Main {
             reader.close();
 
             size = Integer.parseInt(fileValues.get(0));
-
-            objToSpawn = fileValues.get(1).split(" ")[0];
-
-            if (objToSpawn.equals("grass")) {
-                if (fileValues.get(1).contains("-")) {
-                    lowerBound = Integer.parseInt(fileValues.get(1).split(" ")[1].split("-")[0]);
-                    upperBound = Integer.parseInt(fileValues.get(1).split(" ")[1].split("-")[1]);
+            Program p = new Program(size, displaySize, delay);
+            World world = p.getWorld();
+            
+            for (int i = 1 ; i < fileValues.size()-1; i++){
+                objToSpawn = fileValues.get(i).split(" ")[0];
+                if (fileValues.get(i).contains("-")) {
+                    lowerBound = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[0]);
+                    upperBound = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[1]);
 
                     amountToSpawn = rand.nextInt(upperBound-lowerBound) + lowerBound;
                 } else {
-                    amountToSpawn = Integer.parseInt(fileValues.get(1).split(" ")[1]);
+                    amountToSpawn = Integer.parseInt(fileValues.get(i).split(" ")[1]);
+                }
+                for (int k = 0; k < amountToSpawn; k++) {
+                    int x = rand.nextInt(size);
+                    int y = rand.nextInt(size);
+                    Location l = new Location(x, y);
+
+                    while (world.containsNonBlocking(l)) {
+                        x = rand.nextInt(size);
+                        y = rand.nextInt(size);
+                        l = new Location(x, y);
+                    }
+                    if(objToSpawn.equals("grass")){
+                        world.setTile(l, new Grass(world, p));
+
+                    } else if (objToSpawn.equals("rabbit")) {
+                        world.setTile(l, new Rabbit(world, p));
+                    }
                 }
             }
-
-            Program p = new Program(size, displaySize, delay);
-            World world = p.getWorld();
-
-            for (int i = 0; i < amountToSpawn; i++) {
-                int x = rand.nextInt(size);
-                int y = rand.nextInt(size);
-                Location l = new Location(x, y);
-
-                while (!world.isTileEmpty(l)) {
-                    x = rand.nextInt(size);
-                    y = rand.nextInt(size);
-                    l = new Location(x, y);
-                }
-
-                world.setTile(l, new Grass());
-
-                DisplayInformation di = new DisplayInformation(Color.white, "grass");
-                p.setDisplayInformation(Grass.class, di);
-            }
-
             p.show();
 
             for (int i = 0; i < 200; i++) {
                 p.simulate();
             }
+
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         }
+
     }
 }
