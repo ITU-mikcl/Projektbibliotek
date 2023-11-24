@@ -4,10 +4,10 @@ import itumulator.world.World;
 
 import java.awt.*;
 
-public class LivingThings{
+public class SpawnableObjects {
     Program p;
     World world;
-    public LivingThings(World world, Program p, String image){
+    public SpawnableObjects(World world, Program p, String image){
         this.world = world;
         this.p = p;
         DisplayInformation di = new DisplayInformation(Color.black, image);

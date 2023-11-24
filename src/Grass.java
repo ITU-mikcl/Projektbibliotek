@@ -4,30 +4,18 @@ import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.NonBlocking;
 import itumulator.world.World;
-
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class Grass extends LivingThings implements NonBlocking, Actor {
-    Program p;
-    World world;
-    int age;
-    boolean hasDayChaged = false;
+public class Grass extends SpawnableObjects implements NonBlocking, Actor {
+
     public Grass(World world, Program p){
         super(world,p,"grass");
-        age = 0;
     }
     public void act(World world){
-        if(world.isDay() && hasDayChaged){
-            hasDayChaged = false;
-            age++;
-            if(age % 2 == 0){
-                spread();
-            }
-        } else if (world.isNight()) {
-            hasDayChaged = true;
+        if (world.getCurrentTime() % 20 == 0) {
+            spread();
         }
     }
     public void decompose(){
@@ -35,6 +23,7 @@ public class Grass extends LivingThings implements NonBlocking, Actor {
     }
 
     public void spread(){
+
         Set<Location> surroundingTiles = world.getSurroundingTiles();
         List<Location> list = new ArrayList<>(surroundingTiles);
         for (Location location : list) {
