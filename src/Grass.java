@@ -14,7 +14,7 @@ public class Grass extends SpawnableObjects implements NonBlocking, Actor {
         super(world,p,"grass");
     }
     public void act(World world){
-        if (world.getCurrentTime() % 20 == 0) {
+        if (world.getCurrentTime() % 10 == 0) {
             spread();
         }
     }

@@ -34,8 +34,8 @@ public class Main {
             //File myFile = new File("./src/Tema 1/input-filer/t1-1d.txt");
             //File myFile = new File("./src/Tema 1/input-filer/t1-2a.txt");
             //File myFile = new File("./src/Tema 1/input-filer/t1-2b.txt");
-            //File myFile = new File("./src/Tema 1/input-filer/t1-2cde.txt");
-            File myFile = new File("./src/Tema 1/input-filer/t1-2fg.txt");
+            File myFile = new File("./src/Tema 1/input-filer/t1-2cde.txt");
+            //File myFile = new File("./src/Tema 1/input-filer/t1-2fg.txt");
             Scanner reader = new Scanner(myFile);
 
             while (reader.hasNextLine()) {
