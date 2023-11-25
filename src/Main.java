@@ -1,9 +1,6 @@
-import itumulator.executable.DisplayInformation;
 import itumulator.executable.Program;
 import itumulator.world.Location;
 import itumulator.world.World;
-
-import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Random;

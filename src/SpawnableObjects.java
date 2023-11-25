@@ -1,5 +1,4 @@
 import itumulator.executable.DisplayInformation;
-import itumulator.executable.DynamicDisplayInformationProvider;
 import itumulator.executable.Program;
 import itumulator.world.World;
 
