@@ -36,6 +36,9 @@ public class Main {
             //File myFile = new File("./src/Tema 1/input-filer/t1-2b.txt");
             File myFile = new File("./src/Tema 1/input-filer/t1-2cde.txt");
             //File myFile = new File("./src/Tema 1/input-filer/t1-2fg.txt");
+            //File myFile = new File("./src/Tema 1/input-filer/t1-3a.txt");
+            //File myFile = new File("./src/Tema 1/input-filer/t1-3b.txt");
+            //File myFile = new File("./src/Tema 1/input-filer/t1-3a.txt");
             Scanner reader = new Scanner(myFile);
 
             while (reader.hasNextLine()) {
@@ -80,6 +83,15 @@ public class Main {
                         }
 
                         world.setTile(l, new Rabbit(world, p));
+                    } else if(objToSpawn.equals("burrow")){
+                        while (world.containsNonBlocking(l)) {
+                            x = rand.nextInt(size);
+                            y = rand.nextInt(size);
+                            l = new Location(x, y);
+                        }
+
+                        world.setTile(l, new Hole(world, p));
+
                     }
                 }
             }
