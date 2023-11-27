@@ -10,20 +10,44 @@ import java.util.ArrayList;
 public class Main {
 
     public static void main(String[] args) {
-        int size = 0;
+        int size;
         int delay = 1000;
         int displaySize = 800;
 
-        String objToSpawn = "";
-        int lowerBound = 0;
-        int upperBound = 0;
-        int amountToSpawn = 0;
+        String objToSpawn;
+        int lowerBound;
+        int upperBound;
+        int amountToSpawn;
 
         Random rand = new Random();
 
         ArrayList<String> fileValues = new ArrayList<>();
 
+        ArrayList<ArrayList<File>> themes = new ArrayList<>();
+        ArrayList<File> theme1 = new ArrayList<>();
+        ArrayList<File> theme2 = new ArrayList<>();
+
         try {
+
+
+            /*
+             Dette stykke kode står for at tilføje alle filer fra tema 1, til en
+             ArrayList, og derefter tilføjge den Array til vores theme 1 ArrayList.
+             */
+            for (char c = 'a'; c <= 'd'; c++) {
+                String fileName = String.format("t1-1%c.txt", c);
+                String filePath = "./src/Tema 1/input-filer/" + fileName;
+                theme1.add(new File(filePath));
+            }
+            theme1.add(new File("./src/Tema 1/input-filer/t1-2a.txt"));
+            theme1.add(new File("./src/Tema 1/input-filer/t1-2b.txt"));
+            theme1.add(new File("./src/Tema 1/input-filer/t1-2cde.txt"));
+            theme1.add(new File("./src/Tema 1/input-filer/t1-2fg.txt"));
+            theme1.add(new File("./src/Tema 1/input-filer/t1-3a.txt"));
+            theme1.add(new File("./src/Tema 1/input-filer/t1-3b.txt"));
+            themes.add(theme1);
+
+
             //Henter og læser filerne fra opgaven
             //File myFile = new File("./src/Tema 1/input-filer/t1-1a.txt");
             //File myFile = new File("./src/Tema 1/input-filer/t1-1b.txt");
@@ -31,13 +55,14 @@ public class Main {
             //File myFile = new File("./src/Tema 1/input-filer/t1-1d.txt");
             //File myFile = new File("./src/Tema 1/input-filer/t1-2a.txt");
             //File myFile = new File("./src/Tema 1/input-filer/t1-2b.txt");
-            File myFile = new File("./src/Tema 1/input-filer/t1-2cde.txt");
+            //File myFile = new File("./src/Tema 1/input-filer/t1-2cde.txt");
             //File myFile = new File("./src/Tema 1/input-filer/t1-2fg.txt");
             //File myFile = new File("./src/Tema 1/input-filer/t1-3a.txt");
             //File myFile = new File("./src/Tema 1/input-filer/t1-3b.txt");
-            //File myFile = new File("./src/Tema 1/input-filer/t1-3a.txt");
-            Scanner reader = new Scanner(myFile);
 
+            File myFile = theme1.get(9);
+            Scanner reader = new Scanner(myFile);
+            System.out.println(myFile);
             while (reader.hasNextLine()) {
                 fileValues.add(reader.nextLine());
             }
