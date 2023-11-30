@@ -8,6 +8,7 @@ import java.util.Scanner;
 import java.util.ArrayList;
 import packages.*;
 import packages.animals.Rabbit;
+import packages.animals.Wolf;
 import packages.terrain.Grass;
 import packages.terrain.Hole;
 
@@ -51,20 +52,23 @@ public class Main {
             theme1.add(new File("./data/t1/t1-3b.txt"));
             themes.add(theme1);
 
+            theme2.add(new File("./data/t2/t2-1ab.txt"));
+            theme2.add(new File("./data/t2/t2-1c.txt"));
+            theme2.add(new File("./data/t2/t2-2a.txt"));
+            theme2.add(new File("./data/t2/t2-3a.txt"));
+            theme2.add(new File("./data/t2/t2-4a.txt"));
+            theme2.add(new File("./data/t2/t2-5a.txt"));
+            theme2.add(new File("./data/t2/t2-5b.txt"));
+            theme2.add(new File("./data/t2/t2-5c.txt"));
+            theme2.add(new File("./data/t2/t2-6a.txt"));
+            theme2.add(new File("./data/t2/t2-7a.txt"));
+            theme2.add(new File("./data/t2/t2-8a.txt"));
+            theme2.add(new File("./data/t2/t2-1.txt"));
+            theme2.add(new File("./data/t2/t2-1.txt"));
+            themes.add(theme2);
 
-            //Henter og læser filerne fra opgaven
-            //File myFile = new File("./src/Tema 1/input-filer/t1-1a.txt");
-            //File myFile = new File("./src/Tema 1/input-filer/t1-1b.txt");
-            //File myFile = new File("./src/Tema 1/input-filer/t1-1c.txt");
-            //File myFile = new File("./src/Tema 1/input-filer/t1-1d.txt");
-            //File myFile = new File("./src/Tema 1/input-filer/t1-2a.txt");
-            //File myFile = new File("./src/Tema 1/input-filer/t1-2b.txt");
-            //File myFile = new File("./src/Tema 1/input-filer/t1-2cde.txt");
-            //File myFile = new File("./src/Tema 1/input-filer/t1-2fg.txt");
-            //File myFile = new File("./src/Tema 1/input-filer/t1-3a.txt");
-            //File myFile = new File("./src/Tema 1/input-filer/t1-3b.txt");
-
-            File myFile = theme1.get(6);
+            //File myFile = theme2.get(1);
+            File myFile = theme1.get(3);
             Scanner reader = new Scanner(myFile);
             System.out.println(myFile);
             while (reader.hasNextLine()) {
@@ -92,32 +96,46 @@ public class Main {
                     int y = rand.nextInt(size);
                     Location l = new Location(x, y);
 
-                    if(objToSpawn.equals("grass")){
-                        while (world.containsNonBlocking(l)) {
-                            x = rand.nextInt(size);
-                            y = rand.nextInt(size);
-                            l = new Location(x, y);
-                        }
+                    switch (objToSpawn) {
+                        case "grass":
+                            while (world.containsNonBlocking(l)) {
+                                x = rand.nextInt(size);
+                                y = rand.nextInt(size);
+                                l = new Location(x, y);
+                            }
 
-                        world.setTile(l, new Grass(world, p));
+                            world.setTile(l, new Grass(world, p));
 
-                    } else if (objToSpawn.equals("rabbit")) {
-                        while (!world.isTileEmpty(l)) {
-                            x = rand.nextInt(size);
-                            y = rand.nextInt(size);
-                            l = new Location(x, y);
-                        }
+                            break;
+                        case "rabbit":
+                            while (!world.isTileEmpty(l)) {
+                                x = rand.nextInt(size);
+                                y = rand.nextInt(size);
+                                l = new Location(x, y);
+                            }
 
-                        world.setTile(l, new Rabbit(world, p));
-                    } else if(objToSpawn.equals("burrow")){
-                        while (world.containsNonBlocking(l)) {
-                            x = rand.nextInt(size);
-                            y = rand.nextInt(size);
-                            l = new Location(x, y);
-                        }
+                            world.setTile(l, new Rabbit(world, p));
+                            break;
+                        case "burrow":
+                            while (world.containsNonBlocking(l)) {
+                                x = rand.nextInt(size);
+                                y = rand.nextInt(size);
+                                l = new Location(x, y);
+                            }
 
-                        world.setTile(l, new Hole(world, p));
+                            world.setTile(l, new Hole(world, p));
 
+                            break;
+                        case "wolf":
+                            while (world.containsNonBlocking(l)) {
+                                x = rand.nextInt(size);
+                                y = rand.nextInt(size);
+                                l = new Location(x, y);
+                            }
+
+                            world.setTile(l, new Wolf(world, p));
+
+                            break;
                     }
                 }
             }

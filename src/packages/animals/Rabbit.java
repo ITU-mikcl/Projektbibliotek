@@ -26,6 +26,8 @@ public class Rabbit extends SpawnableObjects implements Actor, DynamicDisplayInf
     String[] images = {"rabbit-small", "rabbit-large", "rabbit-small-sleeping", "rabbit-sleeping"};
     int growthState = 0;
 
+    private boolean timeToReproduce = false;
+
     public Rabbit(World world, Program p){
         super(world,p,"rabbit-small");
         this.stepsSinceSpawned = world.getCurrentTime();
@@ -81,11 +83,15 @@ public class Rabbit extends SpawnableObjects implements Actor, DynamicDisplayInf
                 }
             }
 
+        } else {
+            if (timeToReproduce) {
+                reproduce();
+            }
         }
 
         if (stepsSinceSpawned % 20 == 0) {
             if (hunger == 0) {
-                killRabbit();
+                kill();
             }
             hunger--;
         }
@@ -100,15 +106,8 @@ public class Rabbit extends SpawnableObjects implements Actor, DynamicDisplayInf
         grass.decompose();
     }
 
-    public void killRabbit(){
+    public void kill(){
         world.delete(this);
-    }
-    private void reproduce(){
-        for (Location birthLocation: world.getEmptySurroundingTiles()){
-            world.setTile(birthLocation, new Rabbit(world,p));
-            hunger-=3;
-            break;
-        }
     }
     private void lookForPartner(){
             outerloop:
@@ -119,11 +118,19 @@ public class Rabbit extends SpawnableObjects implements Actor, DynamicDisplayInf
                             world.move(this,partnerLocationEmptySurroundingTile);
                             break;
                         }
-                        reproduce();
+                        timeToReproduce = true;
                         break outerloop;
                     }
                 }
            }
+    }
+    private void reproduce(){
+        for (Location birthLocation: world.getEmptySurroundingTiles()){
+            world.setTile(birthLocation, new Rabbit(world,p));
+            hunger-=3;
+            timeToReproduce = false;
+            break;
+        }
     }
     private void lookForFood(){
         try {
