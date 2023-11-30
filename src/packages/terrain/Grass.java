@@ -1,9 +1,11 @@
-
+package packages.terrain;
 import itumulator.executable.Program;
 import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.NonBlocking;
 import itumulator.world.World;
+import packages.SpawnableObjects;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;

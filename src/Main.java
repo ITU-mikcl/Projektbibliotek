@@ -6,6 +6,10 @@ import java.io.FileNotFoundException;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.ArrayList;
+import packages.*;
+import packages.animals.Rabbit;
+import packages.terrain.Grass;
+import packages.terrain.Hole;
 
 public class Main {
 
@@ -36,15 +40,15 @@ public class Main {
              */
             for (char c = 'a'; c <= 'd'; c++) {
                 String fileName = String.format("t1-1%c.txt", c);
-                String filePath = "./src/Tema 1/input-filer/" + fileName;
+                String filePath = "./data/t1/" + fileName;
                 theme1.add(new File(filePath));
             }
-            theme1.add(new File("./src/Tema 1/input-filer/t1-2a.txt"));
-            theme1.add(new File("./src/Tema 1/input-filer/t1-2b.txt"));
-            theme1.add(new File("./src/Tema 1/input-filer/t1-2cde.txt"));
-            theme1.add(new File("./src/Tema 1/input-filer/t1-2fg.txt"));
-            theme1.add(new File("./src/Tema 1/input-filer/t1-3a.txt"));
-            theme1.add(new File("./src/Tema 1/input-filer/t1-3b.txt"));
+            theme1.add(new File("./data/t1/t1-2a.txt"));
+            theme1.add(new File("./data/t1/t1-2b.txt"));
+            theme1.add(new File("./data/t1/t1-2cde.txt"));
+            theme1.add(new File("./data/t1/t1-2fg.txt"));
+            theme1.add(new File("./data/t1/t1-3a.txt"));
+            theme1.add(new File("./data/t1/t1-3b.txt"));
             themes.add(theme1);
 
 
@@ -60,7 +64,7 @@ public class Main {
             //File myFile = new File("./src/Tema 1/input-filer/t1-3a.txt");
             //File myFile = new File("./src/Tema 1/input-filer/t1-3b.txt");
 
-            File myFile = theme1.get(9);
+            File myFile = theme1.get(6);
             Scanner reader = new Scanner(myFile);
             System.out.println(myFile);
             while (reader.hasNextLine()) {

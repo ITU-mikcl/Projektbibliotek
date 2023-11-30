@@ -1,3 +1,4 @@
+package packages;
 import itumulator.executable.DisplayInformation;
 import itumulator.executable.Program;
 import itumulator.world.World;
@@ -5,8 +6,8 @@ import itumulator.world.World;
 import java.awt.*;
 
 public abstract class SpawnableObjects {
-    Program p;
-    World world;
+    public Program p;
+    public World world;
     public SpawnableObjects(World world, Program p, String image){
         this.world = world;
         this.p = p;

@@ -1,9 +1,13 @@
+package packages.animals;
 import itumulator.executable.DisplayInformation;
 import itumulator.executable.DynamicDisplayInformationProvider;
 import itumulator.executable.Program;
 import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.World;
+import packages.SpawnableObjects;
+import packages.terrain.Grass;
+import packages.terrain.Hole;
 
 import java.awt.*;
 
