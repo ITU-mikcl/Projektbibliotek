@@ -6,10 +6,9 @@ import itumulator.world.Location;
 import itumulator.world.World;
 import packages.SpawnableObjects;
 
-public class Wolf extends SpawnableObjects implements Actor {
+public class Wolf extends Animal implements Actor {
     int sizeOfWorld;
     private int stepsSinceSpawned;
-
     private int speed = 2;
     private Location myLocation;
 
@@ -45,20 +44,10 @@ public class Wolf extends SpawnableObjects implements Actor {
 
     }
 
+
+
     private void lookForPrey(){
-        outerloop:
-        for (int i = 1; i < sizeOfWorld; i++) {
-            for (Location preyLocation: world.getSurroundingTiles(myLocation, i)) {
-                if (world.getTile(preyLocation) instanceof Rabbit && !world.getEmptySurroundingTiles(preyLocation).isEmpty()) {
-                    prey = (Rabbit) world.getTile(preyLocation);
-                    for (Location preyLocationEmptySurroundingTile: world.getEmptySurroundingTiles(preyLocation)){
-                        world.move(this,preyLocationEmptySurroundingTile);
-                        break;
-                    }
-                    break outerloop;
-                }
-            }
-        }
+            prey = (Rabbit) world.getTile(super.lookForBlocking(myLocation, Rabbit.class));
     }
 
     private void killPrey(Rabbit prey) {

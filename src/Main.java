@@ -3,6 +3,7 @@ import itumulator.world.Location;
 import itumulator.world.World;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.ArrayList;
@@ -32,9 +33,12 @@ public class Main {
         ArrayList<File> theme1 = new ArrayList<>();
         ArrayList<File> theme2 = new ArrayList<>();
 
+        HashMap<Integer, Wolf> packs = new HashMap<>();
+        int packCounter = 0;
+        Wolf wolfCurrent;
+
+
         try {
-
-
             /*
              Dette stykke kode står for at tilføje alle filer fra tema 1, til en
              ArrayList, og derefter tilføjge den Array til vores theme 1 ArrayList.
@@ -83,6 +87,9 @@ public class Main {
 
             for (int i = 1 ; i < fileValues.size(); i++){
                 objToSpawn = fileValues.get(i).split(" ")[0];
+                if (objToSpawn.equals("wolf")){
+                    packCounter++;
+                }
                 if (fileValues.get(i).contains("-")) {
                     lowerBound = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[0]);
                     upperBound = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[1]);
@@ -132,8 +139,10 @@ public class Main {
                                 y = rand.nextInt(size);
                                 l = new Location(x, y);
                             }
+                            wolfCurrent = new Wolf(world, p);
+                            packs.put(packCounter, wolfCurrent);
 
-                            world.setTile(l, new Wolf(world, p));
+                            world.setTile(l, wolfCurrent);
 
                             break;
                     }
@@ -148,6 +157,8 @@ public class Main {
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         }
-
+    }
+    public HashMap<Integer, Wolf> getPacks(){
+        return packs;
     }
 }

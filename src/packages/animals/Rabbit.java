@@ -11,7 +11,7 @@ import packages.terrain.Hole;
 
 import java.awt.*;
 
-public class Rabbit extends SpawnableObjects implements Actor, DynamicDisplayInformationProvider {
+public class Rabbit extends Animal implements Actor, DynamicDisplayInformationProvider {
     int sizeOfWorld;
     private int hunger = 5;
     private Location rabbitLoaction;
@@ -28,8 +28,8 @@ public class Rabbit extends SpawnableObjects implements Actor, DynamicDisplayInf
 
     private boolean timeToReproduce = false;
 
-    public Rabbit(World world, Program p){
-        super(world,p,"rabbit-small");
+    public Rabbit(World world, Program p) {
+        super(world, p, "rabbit-small");
         this.stepsSinceSpawned = world.getCurrentTime();
         this.sizeOfWorld = world.getSize();
     }
@@ -38,7 +38,7 @@ public class Rabbit extends SpawnableObjects implements Actor, DynamicDisplayInf
     public void act(World world) {
         stepsSinceSpawned++;
 
-        if(!isAdult && stepsSinceSpawned > 60){
+        if (!isAdult && stepsSinceSpawned > 60) {
             isAdult = true;
             speed = 5;
 
@@ -46,17 +46,17 @@ public class Rabbit extends SpawnableObjects implements Actor, DynamicDisplayInf
             getInformation();
         }
 
-        if(stepsSinceSpawned % speed == 0) {
+        if (stepsSinceSpawned % speed == 0) {
             rabbitLoaction = world.getLocation(this);
 
             if (world.isDay()) {
                 if (!isAdult) {
-                    if(growthState == 2) {
+                    if (growthState == 2) {
                         growthState = 0;
                         getInformation();
                     }
                 } else {
-                    if(growthState == 3) {
+                    if (growthState == 3) {
                         growthState = 1;
                         getInformation();
                     }
@@ -64,19 +64,20 @@ public class Rabbit extends SpawnableObjects implements Actor, DynamicDisplayInf
 
                 if (isAdult && hunger >= 5) {
                     lookForPartner();
-                } else{
+                } else {
                     lookForFood();
                 }
             } else {
-                lookForHole();
-
+                if (rabbitLoaction != theHoleLocation){
+                    lookForHole();
+                }
                 if (!isAdult) {
-                    if(growthState == 0) {
+                    if (growthState == 0) {
                         growthState = 2;
                         getInformation();
                     }
                 } else {
-                    if(growthState == 1) {
+                    if (growthState == 1) {
                         growthState = 3;
                         getInformation();
                     }
@@ -106,33 +107,28 @@ public class Rabbit extends SpawnableObjects implements Actor, DynamicDisplayInf
         grass.decompose();
     }
 
-    public void kill(){
+    public void kill() {
         world.delete(this);
     }
-    private void lookForPartner(){
-            outerloop:
-            for (int i = 1; i < sizeOfWorld; i++) {
-                for (Location partnerLocation: world.getSurroundingTiles(rabbitLoaction, i)) {
-                    if (world.getTile(partnerLocation) instanceof Rabbit && !world.getEmptySurroundingTiles(partnerLocation).isEmpty()) {
-                        for (Location partnerLocationEmptySurroundingTile: world.getEmptySurroundingTiles(partnerLocation)){
-                            world.move(this,partnerLocationEmptySurroundingTile);
-                            break;
-                        }
-                        timeToReproduce = true;
-                        break outerloop;
-                    }
-                }
-           }
+
+    private void lookForPartner() {
+        if (lookForBlocking(rabbitLoaction, Rabbit.class) != null) {
+            timeToReproduce = true;
+            reproduce();
+        }
+        ;
     }
-    private void reproduce(){
-        for (Location birthLocation: world.getEmptySurroundingTiles()){
-            world.setTile(birthLocation, new Rabbit(world,p));
-            hunger-=3;
+
+    private void reproduce() {
+        for (Location birthLocation : world.getEmptySurroundingTiles()) {
+            world.setTile(birthLocation, new Rabbit(world, p));
+            hunger -= 3;
             timeToReproduce = false;
             break;
         }
     }
-    private void lookForFood(){
+
+    private void lookForFood() {
         try {
             Object standingOn = world.getNonBlocking(world.getLocation(this));
 
@@ -140,44 +136,19 @@ public class Rabbit extends SpawnableObjects implements Actor, DynamicDisplayInf
                 Grass standingOnGrass = (Grass) standingOn;
                 eat(standingOnGrass);
             } else {
-                findGrass();
+                super.lookForNonBlocking(rabbitLoaction, Grass.class);
             }
         } catch (IllegalArgumentException e) {
-            findGrass();
-        }
-    }
-
-    private void findGrass() {
-        outloop:
-        for (int i = 1; i < sizeOfWorld; i++) {
-            for (Location grassLocation : world.getSurroundingTiles(rabbitLoaction, i)) {
-                if (world.containsNonBlocking(grassLocation)
-                        && world.getNonBlocking(grassLocation) instanceof Grass
-                        && world.isTileEmpty(grassLocation)) {
-                    world.move(this, grassLocation);
-                    break outloop;
-                }
-            }
+            super.lookForNonBlocking(rabbitLoaction, Grass.class);
         }
     }
 
     private void lookForHole() {
-        if (!hasAHole) {
-            outloop:
-            for (int i = 1; i < 3; i++) {
-                for (Location holeLocation : world.getSurroundingTiles(rabbitLoaction, i)) {
-                    if (world.containsNonBlocking(holeLocation)
-                            && world.getNonBlocking(holeLocation) instanceof Hole
-                            && world.isTileEmpty(holeLocation)) {
-                        world.move(this, holeLocation);
-                        theHoleLocation = holeLocation;
-                        hasAHole = true;
-                        break outloop;
-                    }
-                }
-            }
-
-            if (!hasAHole) {
+        if (!hasAHole && hunger >= 3) {
+            if (super.lookForNonBlocking(rabbitLoaction, Hole.class)) {
+                theHoleLocation = rabbitLoaction;
+                hasAHole = true;
+            } else {
                 digHole();
             }
         } else {
@@ -188,7 +159,6 @@ public class Rabbit extends SpawnableObjects implements Actor, DynamicDisplayInf
                 lookForHole();
             }
         }
-
     }
 
     private void digHole() {
@@ -196,6 +166,9 @@ public class Rabbit extends SpawnableObjects implements Actor, DynamicDisplayInf
             world.setTile(rabbitLoaction, new Hole(world, p));
             theHoleLocation = rabbitLoaction;
             hasAHole = true;
+        } else if(hasAHole){
+            lookForFood();
+            digHole();
         }
     }
 }
