@@ -14,7 +14,7 @@ public abstract class Animal extends SpawnableObjects {
     }
 
     protected boolean lookForNonBlocking(Location myLocation, Class<?> targetClass) {
-            for (int i = 1; i < 3; i++) {
+            for (int i = 1; i < sizeOfWorld; i++) {
                 for (Location targetLocation : world.getSurroundingTiles(myLocation, i)) {
                     if (world.containsNonBlocking(targetLocation)
                             && targetClass.isInstance(world.getNonBlocking(targetLocation))

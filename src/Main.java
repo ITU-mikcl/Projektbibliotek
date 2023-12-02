@@ -3,18 +3,15 @@ import itumulator.world.Location;
 import itumulator.world.World;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.ArrayList;
-import packages.*;
 import packages.animals.Rabbit;
 import packages.animals.Wolf;
 import packages.terrain.Grass;
 import packages.terrain.Hole;
 
 public class Main {
-
     public static void main(String[] args) {
         int size;
         int delay = 1000;
@@ -33,10 +30,9 @@ public class Main {
         ArrayList<File> theme1 = new ArrayList<>();
         ArrayList<File> theme2 = new ArrayList<>();
 
-        HashMap<Integer, Wolf> packs = new HashMap<>();
         int packCounter = 0;
         Wolf wolfCurrent;
-
+        boolean shouldBeLeader = false;
 
         try {
             /*
@@ -71,8 +67,8 @@ public class Main {
             theme2.add(new File("./data/t2/t2-1.txt"));
             themes.add(theme2);
 
-            //File myFile = theme2.get(1);
-            File myFile = theme1.get(3);
+            File myFile = theme2.get(3);
+            //File myFile = theme1.get(3);
             Scanner reader = new Scanner(myFile);
             System.out.println(myFile);
             while (reader.hasNextLine()) {
@@ -89,6 +85,7 @@ public class Main {
                 objToSpawn = fileValues.get(i).split(" ")[0];
                 if (objToSpawn.equals("wolf")){
                     packCounter++;
+                    shouldBeLeader = true;
                 }
                 if (fileValues.get(i).contains("-")) {
                     lowerBound = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[0]);
@@ -139,8 +136,8 @@ public class Main {
                                 y = rand.nextInt(size);
                                 l = new Location(x, y);
                             }
-                            wolfCurrent = new Wolf(world, p);
-                            packs.put(packCounter, wolfCurrent);
+                            wolfCurrent = new Wolf(world, p, shouldBeLeader, packCounter);
+                            shouldBeLeader = false;
 
                             world.setTile(l, wolfCurrent);
 
@@ -157,8 +154,5 @@ public class Main {
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         }
-    }
-    public HashMap<Integer, Wolf> getPacks(){
-        return packs;
     }
 }

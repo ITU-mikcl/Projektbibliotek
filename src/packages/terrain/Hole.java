@@ -8,6 +8,6 @@ import packages.SpawnableObjects;
 public class Hole extends SpawnableObjects implements NonBlocking {
 
     public Hole(World world, Program p) {
-        super(world,p,"hole");
+        super(world,p,"hole-small");
     }
 }
