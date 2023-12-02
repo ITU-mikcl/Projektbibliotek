@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.ArrayList;
+
+import packages.FileReader;
 import packages.animals.Rabbit;
 import packages.animals.Wolf;
 import packages.terrain.Grass;
@@ -26,49 +28,11 @@ public class Main {
 
         ArrayList<String> fileValues = new ArrayList<>();
 
-        ArrayList<ArrayList<File>> themes = new ArrayList<>();
-        ArrayList<File> theme1 = new ArrayList<>();
-        ArrayList<File> theme2 = new ArrayList<>();
-
         int packCounter = 0;
         Wolf wolfCurrent;
         boolean shouldBeLeader = false;
-
         try {
-            /*
-             Dette stykke kode står for at tilføje alle filer fra tema 1, til en
-             ArrayList, og derefter tilføjge den Array til vores theme 1 ArrayList.
-             */
-            for (char c = 'a'; c <= 'd'; c++) {
-                String fileName = String.format("t1-1%c.txt", c);
-                String filePath = "./data/t1/" + fileName;
-                theme1.add(new File(filePath));
-            }
-            theme1.add(new File("./data/t1/t1-2a.txt"));
-            theme1.add(new File("./data/t1/t1-2b.txt"));
-            theme1.add(new File("./data/t1/t1-2cde.txt"));
-            theme1.add(new File("./data/t1/t1-2fg.txt"));
-            theme1.add(new File("./data/t1/t1-3a.txt"));
-            theme1.add(new File("./data/t1/t1-3b.txt"));
-            themes.add(theme1);
-
-            theme2.add(new File("./data/t2/t2-1ab.txt"));
-            theme2.add(new File("./data/t2/t2-1c.txt"));
-            theme2.add(new File("./data/t2/t2-2a.txt"));
-            theme2.add(new File("./data/t2/t2-3a.txt"));
-            theme2.add(new File("./data/t2/t2-4a.txt"));
-            theme2.add(new File("./data/t2/t2-5a.txt"));
-            theme2.add(new File("./data/t2/t2-5b.txt"));
-            theme2.add(new File("./data/t2/t2-5c.txt"));
-            theme2.add(new File("./data/t2/t2-6a.txt"));
-            theme2.add(new File("./data/t2/t2-7a.txt"));
-            theme2.add(new File("./data/t2/t2-8a.txt"));
-            theme2.add(new File("./data/t2/t2-1.txt"));
-            theme2.add(new File("./data/t2/t2-1.txt"));
-            themes.add(theme2);
-
-            File myFile = theme2.get(3);
-            //File myFile = theme1.get(3);
+            File myFile = FileReader.run();
             Scanner reader = new Scanner(myFile);
             System.out.println(myFile);
             while (reader.hasNextLine()) {
@@ -76,7 +40,7 @@ public class Main {
             }
 
             reader.close();
-
+        } catch (FileNotFoundException e) {}
             size = Integer.parseInt(fileValues.get(0));
             Program p = new Program(size, displaySize, delay);
             World world = p.getWorld();
@@ -150,9 +114,5 @@ public class Main {
             for (int i = 0; i < 200; i++) {
                 p.simulate();
             }
-
-        } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
         }
-    }
 }
