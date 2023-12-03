@@ -7,7 +7,7 @@ import itumulator.world.Location;
 import itumulator.world.World;
 import packages.SpawnableObjects;
 import packages.terrain.Grass;
-import packages.terrain.Hole;
+import packages.terrain.Burrow;
 
 import java.awt.*;
 
@@ -144,7 +144,7 @@ public class Rabbit extends Animal implements Actor, DynamicDisplayInformationPr
 
     private void lookForHole() {
         if (!hasAHole && hunger >= 3) {
-            if (super.lookForNonBlocking(rabbitLoaction, Hole.class)) {
+            if (super.lookForNonBlocking(rabbitLoaction, Burrow.class)) {
                 theHoleLocation = rabbitLoaction;
                 hasAHole = true;
             } else {
@@ -162,7 +162,7 @@ public class Rabbit extends Animal implements Actor, DynamicDisplayInformationPr
 
     private void digHole() {
         if (!world.containsNonBlocking(rabbitLoaction)) {
-            world.setTile(rabbitLoaction, new Hole(world, p));
+            world.setTile(rabbitLoaction, new Burrow(world, p));
             theHoleLocation = rabbitLoaction;
             hasAHole = true;
         } else if(hasAHole){

@@ -4,7 +4,7 @@ import itumulator.executable.Program;
 import itumulator.world.Location;
 import itumulator.world.World;
 import packages.SpawnableObjects;
-import packages.terrain.Hole;
+
 
 public abstract class Animal extends SpawnableObjects {
     int sizeOfWorld;
