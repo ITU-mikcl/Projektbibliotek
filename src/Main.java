@@ -1,5 +1,4 @@
 import itumulator.executable.Program;
-import itumulator.world.Location;
 import itumulator.world.World;
 import java.io.File;
 import java.io.FileNotFoundException;

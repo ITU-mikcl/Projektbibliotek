@@ -1,57 +1,38 @@
 package packages.animals;
 
 import itumulator.executable.DisplayInformation;
-import itumulator.executable.DynamicDisplayInformationProvider;
 import itumulator.executable.Program;
 import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.World;
-import packages.SpawnableObjects;
 
 import java.awt.*;
 
-public class Wolf extends Animal implements Actor, DynamicDisplayInformationProvider {
-    int sizeOfWorld;
-    private int stepsSinceSpawned;
-    private int speed = 2;
+public class Wolf extends Animal implements Actor {
     private Location myLocation;
     private int hunger = 5;
     private Rabbit prey;
-    private boolean isLeader;
-    private int myPack;
-
-    String[] images = {"wolf-small", "wolf-large", "wollfl-small-sleeping", "wolf-sleeping"};
-    int growthState = 0;
+    private final boolean isLeader;
+    private final int myPack;
+    String[] images = {"wolf-small", "wollfl-small-sleeping", "wolf", "wolf-sleeping"};
 
     public Wolf(World world, Program p, boolean isLeader, int myPack){
-        super(world,p,"wolf-small");
-        this.stepsSinceSpawned = world.getCurrentTime();
-        this.sizeOfWorld = world.getSize();
+        super(world,p,"wolf-small", 4);
         this.isLeader = isLeader;
         this.myPack = myPack;
     }
 
-    public void kill(){
-        world.delete(this);
-    }
-
     public DisplayInformation getInformation() {
-        return new DisplayInformation(Color.white, images[growthState]);
+        return new DisplayInformation(Color.white, images[super.getState()]);
     }
 
     public void act(World world) {
-        stepsSinceSpawned++;
+        hunger = super.statusCheck(this, hunger);
 
         if (world.isDay()) {
-            if (growthState == 2) {
-                growthState = 0;
-                getInformation();
-            }
 
-            if (stepsSinceSpawned % speed == 0) {
+            if (super.canIAct()) {
                 myLocation = world.getLocation(this);
-                hunger--;
-
                 if (hunger <= 2 && isLeader) {
                     lookForPrey();
                 } else {
@@ -62,16 +43,9 @@ public class Wolf extends Animal implements Actor, DynamicDisplayInformationProv
                     killPrey(prey);
                 }
             }
-        } else {
-            if (growthState == 0) {
-                growthState = 2;
-                getInformation();
-            }
         }
 
     }
-
-
 
     private void lookForPrey(){
         try {
@@ -82,7 +56,7 @@ public class Wolf extends Animal implements Actor, DynamicDisplayInformationProv
     }
 
     private void killPrey(Rabbit prey) {
-        prey.kill();
+        super.die(prey);
         hunger += 10;
         this.prey = null;
     }

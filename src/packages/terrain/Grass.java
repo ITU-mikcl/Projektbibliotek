@@ -25,7 +25,6 @@ public class Grass extends SpawnableObjects implements NonBlocking, Actor {
     }
 
     public void spread(){
-
         Set<Location> surroundingTiles = world.getSurroundingTiles();
         List<Location> list = new ArrayList<>(surroundingTiles);
         for (Location location : list) {

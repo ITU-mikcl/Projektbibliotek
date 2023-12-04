@@ -1,86 +1,42 @@
 package packages.animals;
+
 import itumulator.executable.DisplayInformation;
-import itumulator.executable.DynamicDisplayInformationProvider;
 import itumulator.executable.Program;
 import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.World;
-import packages.SpawnableObjects;
 import packages.terrain.Grass;
 import packages.terrain.Burrow;
 
 import java.awt.*;
 
-public class Rabbit extends Animal implements Actor, DynamicDisplayInformationProvider {
-    int sizeOfWorld;
+public class Rabbit extends Animal implements Actor {
     private int hunger = 5;
-    private Location rabbitLoaction;
-
-    private int stepsSinceSpawned;
-    boolean isAdult = false;
-    private int speed = 2;
-
-    boolean hasAHole = false;
-    Location theHoleLocation;
-
-    String[] images = {"rabbit-small", "rabbit-large", "rabbit-small-sleeping", "rabbit-sleeping"};
-    int growthState = 0;
-
+    private Location myLocation;
+    private boolean hasAHole = false;
+    private Location theHoleLocation;
     private boolean timeToReproduce = false;
-
+    final String[] images = {"rabbit-small", "rabbit-small-sleeping", "rabbit-large", "rabbit-sleeping"};
     public Rabbit(World world, Program p) {
-        super(world, p, "rabbit-small");
-        this.stepsSinceSpawned = world.getCurrentTime();
-        this.sizeOfWorld = world.getSize();
+        super(world, p, "rabbit-small", 2);
     }
 
     @Override
     public void act(World world) {
-        stepsSinceSpawned++;
+        hunger = super.statusCheck(this, hunger);
 
-        if (!isAdult && stepsSinceSpawned > 60) {
-            isAdult = true;
-            speed = 5;
-
-            growthState = 1;
-            getInformation();
-        }
-
-        if (stepsSinceSpawned % speed == 0) {
-            rabbitLoaction = world.getLocation(this);
+        if (super.canIAct()) {
+            myLocation = world.getLocation(this);
 
             if (world.isDay()) {
-                if (!isAdult) {
-                    if (growthState == 2) {
-                        growthState = 0;
-                        getInformation();
-                    }
-                } else {
-                    if (growthState == 3) {
-                        growthState = 1;
-                        getInformation();
-                    }
-                }
-
-                if (isAdult && hunger >= 5) {
+                if (super.isAdult() && hunger >= 5) {
                     lookForPartner();
                 } else {
                     lookForFood();
                 }
             } else {
-                if (rabbitLoaction != theHoleLocation){
+                if (myLocation != theHoleLocation){
                     lookForHole();
-                }
-                if (!isAdult) {
-                    if (growthState == 0) {
-                        growthState = 2;
-                        getInformation();
-                    }
-                } else {
-                    if (growthState == 1) {
-                        growthState = 3;
-                        getInformation();
-                    }
                 }
             }
 
@@ -89,17 +45,6 @@ public class Rabbit extends Animal implements Actor, DynamicDisplayInformationPr
                 reproduce();
             }
         }
-
-        if (stepsSinceSpawned % 20 == 0) {
-            if (hunger == 0) {
-                kill();
-            }
-            hunger--;
-        }
-    }
-
-    public DisplayInformation getInformation() {
-        return new DisplayInformation(Color.white, images[growthState]);
     }
 
     public void eat(Grass grass) {
@@ -107,12 +52,8 @@ public class Rabbit extends Animal implements Actor, DynamicDisplayInformationPr
         grass.decompose();
     }
 
-    public void kill() {
-        world.delete(this);
-    }
-
     private void lookForPartner() {
-        if (lookForBlocking(rabbitLoaction, Rabbit.class) != null) {
+        if (lookForBlocking(myLocation, Rabbit.class) != null) {
             timeToReproduce = true;
             reproduce();
         }
@@ -135,17 +76,17 @@ public class Rabbit extends Animal implements Actor, DynamicDisplayInformationPr
                 Grass standingOnGrass = (Grass) standingOn;
                 eat(standingOnGrass);
             } else {
-                super.lookForNonBlocking(rabbitLoaction, Grass.class);
+                super.lookForNonBlocking(myLocation, Grass.class);
             }
         } catch (IllegalArgumentException e) {
-            super.lookForNonBlocking(rabbitLoaction, Grass.class);
+            super.lookForNonBlocking(myLocation, Grass.class);
         }
     }
 
     private void lookForHole() {
         if (!hasAHole && hunger >= 3) {
-            if (super.lookForNonBlocking(rabbitLoaction, Burrow.class)) {
-                theHoleLocation = rabbitLoaction;
+            if (super.lookForNonBlocking(myLocation, Burrow.class)) {
+                theHoleLocation = myLocation;
                 hasAHole = true;
             } else {
                 digHole();
@@ -161,13 +102,17 @@ public class Rabbit extends Animal implements Actor, DynamicDisplayInformationPr
     }
 
     private void digHole() {
-        if (!world.containsNonBlocking(rabbitLoaction)) {
-            world.setTile(rabbitLoaction, new Burrow(world, p));
-            theHoleLocation = rabbitLoaction;
+        if (!world.containsNonBlocking(myLocation)) {
+            world.setTile(myLocation, new Burrow(world, p));
+            theHoleLocation = myLocation;
             hasAHole = true;
         } else if(hasAHole){
             lookForFood();
             digHole();
         }
+    }
+
+    public DisplayInformation getInformation() {
+        return new DisplayInformation(Color.white, images[super.getState()]);
     }
 }

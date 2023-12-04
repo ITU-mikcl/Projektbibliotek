@@ -60,10 +60,8 @@ public class Spawner{
                         }
                         wolfPacks.get(wolfPacks.size()-1).addWolf(wolfCurrent);
                         world.setTile(l, wolfCurrent);
-                    }else if(animals.contains(objToSpawn)){
-                        spawnObject(objToSpawn, world,p,size, true);
-                    }else {
-                        spawnObject(objToSpawn, world,p,size, false);
+                    } else {
+                        spawnObject(objToSpawn, world,p,size, animals.contains(objToSpawn));
                     }
 
             }

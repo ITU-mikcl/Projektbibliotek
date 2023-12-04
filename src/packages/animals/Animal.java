@@ -1,16 +1,69 @@
 package packages.animals;
 
+import itumulator.executable.DynamicDisplayInformationProvider;
 import itumulator.executable.Program;
 import itumulator.world.Location;
 import itumulator.world.World;
 import packages.SpawnableObjects;
 
-
-public abstract class Animal extends SpawnableObjects {
-    int sizeOfWorld;
-    public Animal (World world, Program p, String image){
+public abstract class Animal extends SpawnableObjects implements DynamicDisplayInformationProvider {
+    final int sizeOfWorld = world.getSize();
+    private int stepsSinceSpawned = 0;
+    private int speed;
+    private boolean isAdult = false;
+    private int currentTime = 0;
+    public Animal (World world, Program p, String image, int speed){
         super(world,p,image);
-        this.sizeOfWorld = world.getSize();
+        this.speed = speed;
+    }
+
+    protected boolean isAdult() {
+        if (!isAdult && stepsSinceSpawned > 60) {
+            isAdult = true;
+            speed /= 2;
+        }
+
+        return isAdult;
+    }
+
+    protected int getState() {
+        if(isAdult()) {
+            if (world.isDay()) {
+                return 2;
+            } else {
+                return 3;
+            }
+        } else if (world.isDay()) {
+            return 0;
+        } else {
+            return 1;
+        }
+    }
+
+    protected void die(Object me) {
+        world.delete(me);
+    }
+
+    protected int statusCheck(Object me, int hunger) {
+        stepsSinceSpawned++;
+        currentTime = world.getCurrentTime();
+
+        if (currentTime == 0) {
+
+            getInformation();
+        } else if (currentTime == 10) {
+            getInformation();
+        }
+
+        if (hunger == 0) {
+            die(me);
+        }
+
+        return --hunger;
+    }
+
+    protected boolean canIAct() {
+        return stepsSinceSpawned % speed == 0;
     }
 
     protected boolean lookForNonBlocking(Location myLocation, Class<?> targetClass) {
