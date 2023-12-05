@@ -6,6 +6,8 @@ import itumulator.world.Location;
 import itumulator.world.World;
 import packages.SpawnableObjects;
 
+import java.util.Set;
+
 public abstract class Animal extends SpawnableObjects implements DynamicDisplayInformationProvider {
     final int sizeOfWorld = world.getSize();
     private int stepsSinceSpawned = 0;
@@ -66,19 +68,20 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
         return stepsSinceSpawned % speed == 0;
     }
 
-    protected boolean lookForNonBlocking(Location myLocation, Class<?> targetClass) {
-            for (int i = 1; i < sizeOfWorld; i++) {
-                for (Location targetLocation : world.getSurroundingTiles(myLocation, i)) {
-                    if (world.containsNonBlocking(targetLocation)
-                            && targetClass.isInstance(world.getNonBlocking(targetLocation))
-                            && world.isTileEmpty(targetLocation)) {
-                        world.move(this, targetLocation);
-                        return true;
-                    }
+    protected Location lookForNonBlocking(Location myLocation, Class<?> targetClass) {
+        for (int i = 1; i < sizeOfWorld; i++) {
+            for (Location targetLocation : world.getSurroundingTiles(myLocation, i)) {
+                if (world.containsNonBlocking(targetLocation)
+                        && targetClass.isInstance(world.getNonBlocking(targetLocation))
+                        && world.isTileEmpty(targetLocation)) {
+                    //world.move(this, targetLocation);
+                    return targetLocation;
                 }
             }
-            return false;
+        }
+        return null;
     }
+
     protected Location lookForBlocking(Location myLocation, Class<?> targetClass){
         for (int i = 1; i < sizeOfWorld; i++) {
             for (Location targetLocation: world.getSurroundingTiles(myLocation, i)) {
@@ -91,5 +94,29 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
             }
         }
         return null;
+    }
+    protected double calculateDistance(Location myLocation, Class<?> targetClass){
+        double x1 = myLocation.getX();
+        double y1 = myLocation.getY();
+        double x2 = lookForNonBlocking(myLocation, targetClass).getX();
+        double y2 = lookForNonBlocking(myLocation, targetClass).getY();
+
+        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    }
+
+    public void moveToTile(Location myLocation, Class<?> targetClass){
+        double minDistance = Double.POSITIVE_INFINITY;
+        for (Location tile : world.getSurroundingTiles(myLocation)){
+            double x1 = lookForNonBlocking(myLocation, targetClass).getX();;
+            double y1 = lookForNonBlocking(myLocation, targetClass).getY();;
+            double x2 = tile.getX();
+            double y2 = tile.getY();
+            double surroundingDistance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            double distance = calculateDistance(myLocation, targetClass) - surroundingDistance;
+            if(distance < surroundingDistance){
+                world.move(this, tile);
+            }
+        }
+
     }
 }
