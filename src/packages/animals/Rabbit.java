@@ -25,25 +25,29 @@ public class Rabbit extends Animal implements Actor {
     public void act(World world) {
         hunger = super.statusCheck(this, hunger);
 
-        if (super.canIAct()) {
-            myLocation = world.getLocation(this);
+        try {
+            if (super.canIAct()) {
+                myLocation = world.getLocation(this);
 
-            if (world.isDay()) {
-                if (super.isAdult() && hunger >= 5) {
-                    lookForPartner();
+                if (world.isDay()) {
+                    if (super.isAdult() && hunger >= 5) {
+                        lookForPartner();
+                    } else {
+                        lookForFood();
+                    }
                 } else {
-                    lookForFood();
+                    if (myLocation != theHoleLocation){
+                        lookForHole();
+                    }
                 }
-            } else {
-                if (myLocation != theHoleLocation){
-                    lookForHole();
-                }
-            }
 
-        } else {
-            if (timeToReproduce) {
-                reproduce();
+            } else {
+                if (timeToReproduce) {
+                    reproduce();
+                }
             }
+        } catch (IllegalArgumentException e) {
+
         }
     }
 
@@ -84,7 +88,7 @@ public class Rabbit extends Animal implements Actor {
     }
 
     private void lookForHole() {
-        if (!hasAHole && hunger >= 3) {
+        if (!hasAHole) {
             if (super.lookForNonBlocking(myLocation, Burrow.class)) {
                 theHoleLocation = myLocation;
                 hasAHole = true;
@@ -92,27 +96,25 @@ public class Rabbit extends Animal implements Actor {
                 digHole();
             }
         } else {
-            if (world.isTileEmpty(theHoleLocation)) {
-                world.move(this, theHoleLocation);
-            } else {
-                hasAHole = false;
-                lookForHole();
-            }
+            world.move(this, theHoleLocation);
+            world.remove(this);
         }
     }
 
     private void digHole() {
-        if (!world.containsNonBlocking(myLocation)) {
-            world.setTile(myLocation, new Burrow(world, p));
-            theHoleLocation = myLocation;
-            hasAHole = true;
-        } else if(hasAHole){
-            lookForFood();
-            digHole();
-        }
+        world.setTile(myLocation, new Burrow(world, p));
+        theHoleLocation = myLocation;
+        hasAHole = true;
+        world.remove(this);
     }
 
     public DisplayInformation getInformation() {
         return new DisplayInformation(Color.white, images[super.getState()]);
+    }
+
+    protected void wakeUp() {
+        if (!world.isOnTile()) {
+            world.setTile(lookForBlocking(theHoleLocation), this);
+        }
     }
 }
