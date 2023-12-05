@@ -11,42 +11,47 @@ import packages.terrain.Burrow;
 import java.awt.*;
 
 public class Rabbit extends Animal implements Actor {
-    private int hunger = 5;
+    private int hunger = 50;
     private Location myLocation;
-    private boolean hasAHole = false;
-    private Location theHoleLocation;
+    private Location burrowLocation = null;
     private boolean timeToReproduce = false;
     final String[] images = {"rabbit-small", "rabbit-small-sleeping", "rabbit-large", "rabbit-sleeping"};
     public Rabbit(World world, Program p) {
-        super(world, p, "rabbit-small", 2);
+        super(world, p, "rabbit-small", 1);
     }
 
     @Override
     public void act(World world) {
-        hunger = super.statusCheck(this, hunger);
+        hunger = statusCheck(this, hunger);
 
-        try {
-            if (super.canIAct()) {
-                myLocation = world.getLocation(this);
-
+        if (!isDead()) {
+            if (canIAct()) {
                 if (world.isDay()) {
-                    if (super.isAdult() && hunger >= 5) {
+                    if (!world.isOnTile(this)) {
+                        world.setTile(getEmptyTile(burrowLocation), this);
+                    }
+
+                    myLocation = world.getLocation(this);
+
+                    if (isAdult() && hunger >= 5) {
                         lookForPartner();
                     } else {
                         lookForFood();
                     }
                 } else {
-                    if (myLocation != theHoleLocation){
-                        lookForHole();
+                    if (world.isOnTile(this)) {
+                        if (myLocation != burrowLocation){
+                            lookForHole();
+                        } else {
+                            world.remove(this);
+                        }
                     }
                 }
-
             } else {
                 if (timeToReproduce) {
                     reproduce();
                 }
             }
-        } catch (IllegalArgumentException e) {
 
         }
     }
@@ -80,41 +85,28 @@ public class Rabbit extends Animal implements Actor {
                 Grass standingOnGrass = (Grass) standingOn;
                 eat(standingOnGrass);
             } else {
-                super.lookForNonBlocking(myLocation, Grass.class);
+                moveToTile(myLocation, Grass.class);
             }
         } catch (IllegalArgumentException e) {
-            super.lookForNonBlocking(myLocation, Grass.class);
+            moveToTile(myLocation, Grass.class);
         }
     }
 
     private void lookForHole() {
-        if (!hasAHole) {
-            if (super.lookForNonBlocking(myLocation, Burrow.class)) {
-                theHoleLocation = myLocation;
-                hasAHole = true;
-            } else {
-                digHole();
-            }
-        } else {
-            world.move(this, theHoleLocation);
-            world.remove(this);
-        }
-    }
+        if (burrowLocation == null) {
+            burrowLocation = lookForNonBlocking(myLocation, Burrow.class);
 
-    private void digHole() {
-        world.setTile(myLocation, new Burrow(world, p));
-        theHoleLocation = myLocation;
-        hasAHole = true;
-        world.remove(this);
+            if (burrowLocation == null) {
+                world.setTile(myLocation, new Burrow(world, p));
+                burrowLocation = myLocation;
+            }
+        }
+
+        moveToTile(myLocation, Burrow.class);
+        myLocation = burrowLocation;
     }
 
     public DisplayInformation getInformation() {
-        return new DisplayInformation(Color.white, images[super.getState()]);
-    }
-
-    protected void wakeUp() {
-        if (!world.isOnTile()) {
-            world.setTile(lookForBlocking(theHoleLocation), this);
-        }
+        return new DisplayInformation(Color.white, images[getState()]);
     }
 }
