@@ -19,5 +19,4 @@ public class WolfPack{
     public void addWolf(Wolf wolf){
         pack.add(wolf);
     }
-
 }

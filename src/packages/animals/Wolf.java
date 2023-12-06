@@ -7,13 +7,14 @@ import itumulator.world.Location;
 import itumulator.world.World;
 
 import java.awt.*;
+import java.util.HashSet;
 import java.util.Set;
 
 public class Wolf extends Animal implements Actor {
     private Location myLocation;
     private int hunger = 15;
     private Rabbit prey;
-    private final boolean isLeader;
+    private boolean isLeader;
     private final int myPack;
     String[] images = {"wolf-small", "wollfl-small-sleeping", "wolf", "wolf-sleeping"};
 
@@ -32,20 +33,24 @@ public class Wolf extends Animal implements Actor {
         hunger = super.statusCheck(this, hunger);
 
         if (world.isDay()) {
-
-            if (super.canIAct()) {
-                myLocation = world.getLocation(this);
+            if (canIAct()) {
+                if (world.isOnTile(this)){
+                    myLocation = world.getLocation(this);
+                }
                 if (hunger <= 10 && isLeader) {
                     lookForPrey();
                     if (prey != null) {
                         killPrey(prey);
                     }
                 } else {
-                    followLeader();
+                    if(doesPackHaveALeader()){
+                        followLeader();
+                    }else {
+                        isLeader = true;
+                    }
                 }
             }
         }
-
     }
 
     private void lookForPrey(){
@@ -96,21 +101,39 @@ public class Wolf extends Animal implements Actor {
         if (myPack == itsPack) {
             return isLeader;
         }
+        return false;
+    }
 
+    private boolean doesPackHaveALeader(){
+        for (Wolf wolf : getAllWolves()) {
+            if (wolf.isThisTheLeaderOfMyPack(itsPack())) {
+                return true;
+            }
+        }
         return false;
     }
 
     private void followLeader() {
-        Object theTarget;
         outerLoop:
-        for (Location targetLocation : world.getSurroundingTiles(myLocation, sizeOfWorld)) {
-            theTarget = world.getTile(targetLocation);
-            if (theTarget instanceof Wolf && !world.getEmptySurroundingTiles(targetLocation).isEmpty() && ((Wolf) theTarget).isThisTheLeaderOfMyPack(itsPack())) {
-                for (Location partnerLocationEmptySurroundingTile : world.getEmptySurroundingTiles(targetLocation)){
+        for (Wolf wolf : getAllWolves()) {
+            if (!world.getEmptySurroundingTiles(world.getLocation(wolf)).isEmpty() && wolf.isThisTheLeaderOfMyPack(itsPack())) {
+                for (Location partnerLocationEmptySurroundingTile : world.getEmptySurroundingTiles(world.getLocation(wolf))){
                     moveToLocation(myLocation, partnerLocationEmptySurroundingTile);
                     break outerLoop;
                 }
             }
         }
+    }
+
+    private Set<Wolf> getAllWolves(){
+        Object tile;
+        Set<Wolf> allWolves = new HashSet<>();
+        for (Location targetLocation : world.getSurroundingTiles(myLocation, sizeOfWorld)) {
+            tile = world.getTile(targetLocation);
+            if (tile instanceof Wolf) {
+                allWolves.add((Wolf) tile);
+            }
+        }
+        return allWolves;
     }
 }
