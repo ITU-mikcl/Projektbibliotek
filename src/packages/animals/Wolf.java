@@ -5,48 +5,76 @@ import itumulator.executable.Program;
 import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.World;
+import packages.Spawner;
+import packages.terrain.Burrow;
 
 import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 
 public class Wolf extends Animal implements Actor {
-    private Location myLocation;
-    private int hunger = 15;
     private Rabbit prey;
     private boolean isLeader;
     private final int myPack;
     String[] images = {"wolf-small", "wollfl-small-sleeping", "wolf", "wolf-sleeping"};
+    Wolf newWolf = null;
 
     public Wolf(World world, Program p, boolean isLeader, int myPack){
-        super(world,p,"wolf-small", 2);
+        super(world,p,"wolf-small", 2, 15);
         this.isLeader = isLeader;
         this.myPack = myPack;
     }
 
     public DisplayInformation getInformation() {
-        //return new DisplayInformation(Color.white, images[super.getState()]);
-        return new DisplayInformation(Color.white, images[0]);
+        return new DisplayInformation(Color.white, images[getState(isOnBurrow(burrowLocation, myLocation))]);
     }
 
     public void act(World world) {
         hunger = super.statusCheck(this, hunger);
 
-        if (world.isDay()) {
+        if (!isDead()) {
             if (canIAct()) {
-                if (world.isOnTile(this)){
-                    myLocation = world.getLocation(this);
-                }
-                if (hunger <= 10 && isLeader) {
-                    lookForPrey();
-                    if (prey != null) {
-                        killPrey(prey);
+                if (world.isDay()) {
+                    if (!world.isOnTile(this)){
+                        world.setTile(getEmptyTile(burrowLocation), this);
+                    } else {
+                        myLocation = world.getLocation(this);
+
+
+                        if (isLeader) {
+                            if (newWolf != null) {
+                                Spawner.spawnWolf(burrowLocation, burrowLocation.getX(), burrowLocation.getY(), Spawner.size, 1);
+                                newWolf = null;
+                            }
+
+                            if (hunger <= 10) {
+                                lookForPrey();
+                                if (prey != null) {
+                                    killPrey(prey);
+                                }
+                            }
+                        } else {
+                            if(doesPackHaveALeader()){
+                                followLeader();
+                            }else {
+                                isLeader = true;
+                            }
+                        }
+
                     }
                 } else {
-                    if(doesPackHaveALeader()){
-                        followLeader();
-                    }else {
-                        isLeader = true;
+                    if (world.isOnTile(this)) {
+                        myLocation = world.getLocation(this);
+
+                        if (!isOnBurrow(burrowLocation, myLocation)){
+                            lookForHole();
+                        } else {
+                            world.remove(this);
+
+                            if (isLeader) {
+                                reproduce();
+                            }
+                        }
                     }
                 }
             }
@@ -57,11 +85,10 @@ public class Wolf extends Animal implements Actor {
         try {
             prey = (Rabbit) world.getTile(lookForBlocking(myLocation, Rabbit.class));
         } catch (NullPointerException e) {
-
         }
     }
 
-    private void killPrey(Object prey) {
+    private void killPrey(Animal prey) {
         try{
             Location anyBlockingLocation = lookForAnyBlocking(myLocation, prey.getClass(), 1);
             Set<Location> surroundingTiles = world.getSurroundingTiles(myLocation);
@@ -69,7 +96,7 @@ public class Wolf extends Animal implements Actor {
                 if (anyBlockingLocation != null) {
                     if (surroundingTile.hashCode() == anyBlockingLocation.hashCode()) {
                         die(prey);
-                        increaseHungerForPack();
+                        changeHungerForPack(10);
                         this.prey = null;
                         return;
                     }
@@ -79,18 +106,18 @@ public class Wolf extends Animal implements Actor {
         }catch (NullPointerException ignore){}
     }
 
-    private void increaseHungerForPack(){
+    private void changeHungerForPack(int hungerAmount){
         Object theTarget;
-        increaseHunger();
+        changeHunger(hungerAmount);
         for (Location targetLocation : world.getSurroundingTiles(myLocation, sizeOfWorld)) {
             theTarget = world.getTile(targetLocation);
             if (theTarget instanceof Wolf && ((Wolf) theTarget).itsPack() == myPack) {
-                ((Wolf) theTarget).increaseHunger();
+                ((Wolf) theTarget).changeHunger(hungerAmount);
             }
         }
     }
-    private void increaseHunger(){
-        hunger += 10;
+    private void changeHunger(int hungerAmount){
+        hunger += (hungerAmount);
     }
 
     private int itsPack() {
@@ -135,5 +162,42 @@ public class Wolf extends Animal implements Actor {
             }
         }
         return allWolves;
+    }
+
+    private Set<Wolf> getAllWolvesInMyPack(){
+        Set<Wolf> allWolves = new HashSet<>();
+
+        for (Wolf wolf : getAllWolves()) {
+            if(wolf.itsPack() == myPack) {
+                allWolves.add(wolf);
+            }
+        }
+
+        return allWolves;
+    }
+
+    private void lookForHole() {
+        if (burrowLocation == null) {
+            if (!world.containsNonBlocking(myLocation)) {
+                world.setTile(myLocation, new Burrow(world, p, "hole"));
+                burrowLocation = myLocation;
+
+                for (Wolf wolf : getAllWolvesInMyPack()) {
+                    wolf.burrowLocation = burrowLocation;
+                }
+            }
+        } else {
+            moveToLocation(myLocation, burrowLocation);
+            myLocation = world.getLocation(this);
+        }
+    }
+
+    private void reproduce() {
+        if (isAdult() && hunger >= 5) {
+            newWolf = new Wolf(world, p, false, myPack);
+            Spawner.getMyWolfpack(myPack).addWolf(newWolf);
+            newWolf.burrowLocation = burrowLocation;
+            changeHungerForPack(-5);
+        }
     }
 }

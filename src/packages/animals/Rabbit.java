@@ -11,13 +11,9 @@ import packages.terrain.Burrow;
 import java.awt.*;
 
 public class Rabbit extends Animal implements Actor {
-    private int hunger = 10;
-    private Location myLocation;
-    private Location burrowLocation = null;
-
     final String[] images = {"rabbit-small", "rabbit-small-sleeping", "rabbit-large", "rabbit-sleeping"};
     public Rabbit(World world, Program p) {
-        super(world, p, "rabbit-small", 2);
+        super(world, p, "rabbit-small", 2, 10);
     }
 
     @Override
@@ -43,7 +39,7 @@ public class Rabbit extends Animal implements Actor {
                     if (world.isOnTile(this)) {
                         myLocation = world.getLocation(this);
 
-                        if (!isOnBurrow()){
+                        if (!isOnBurrow(burrowLocation, myLocation)){
                             lookForHole();
                         } else {
                             world.remove(this);
@@ -52,10 +48,6 @@ public class Rabbit extends Animal implements Actor {
                 }
             }
         }
-    }
-
-    protected boolean isOnBurrow() {
-        return burrowLocation != null && myLocation.hashCode() == burrowLocation.hashCode();
     }
 
     public void eat(Grass grass) {
@@ -104,7 +96,7 @@ public class Rabbit extends Animal implements Actor {
                 if (world.containsNonBlocking(myLocation)) {
                     lookForFood();
                 } else {
-                    world.setTile(myLocation, new Burrow(world, p));
+                    world.setTile(myLocation, new Burrow(world, p, "hole-small"));
                     burrowLocation = myLocation;
                 }
             }
@@ -112,10 +104,9 @@ public class Rabbit extends Animal implements Actor {
             moveToLocation(myLocation, burrowLocation);
             myLocation = world.getLocation(this);
         }
-
     }
 
     public DisplayInformation getInformation() {
-        return new DisplayInformation(Color.white, images[getState(isOnBurrow())]);
+        return new DisplayInformation(Color.white, images[getState(isOnBurrow(burrowLocation, myLocation))]);
     }
 }

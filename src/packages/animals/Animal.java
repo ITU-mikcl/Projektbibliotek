@@ -6,6 +6,7 @@ import itumulator.world.Location;
 import itumulator.world.World;
 import packages.SpawnableObjects;
 
+import javax.swing.table.TableRowSorter;
 import java.util.Set;
 
 public abstract class Animal extends SpawnableObjects implements DynamicDisplayInformationProvider {
@@ -14,9 +15,13 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
     private int speed;
     private boolean isAdult = false;
     private boolean isDead = false;
-    public Animal (World world, Program p, String image, int speed){
+    protected Location burrowLocation = null;
+    protected Location myLocation;
+    protected int hunger;
+    public Animal (World world, Program p, String image, int speed, int hunger){
         super(world,p,image);
         this.speed = speed;
+        this.hunger = hunger;
     }
 
     protected boolean isAdult() {
@@ -42,8 +47,8 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
         }
     }
 
-    protected void die(Object me) {
-        isDead = true;
+    protected void die(Animal me) {
+        me.isDead = true;
         world.delete(me);
     }
 
@@ -51,7 +56,7 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
         return isDead;
     }
 
-    protected int statusCheck(Object me, int hunger) {
+    protected int statusCheck(Animal me, int hunger) {
         stepsSinceSpawned++;
 
         if (hunger == 0) {
@@ -66,7 +71,11 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
     }
 
     protected boolean canIAct() {
-        return stepsSinceSpawned % speed == 0;
+        try {
+            return stepsSinceSpawned % speed == 0;
+        } catch (ArithmeticException e) {
+            return true;
+        }
     }
 
     protected Location lookForAnyBlocking(Location myLocation, Class<?> targetClass, int radius){
@@ -78,6 +87,7 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
         }
         return null;
     }
+
     protected Location lookForNonBlocking(Location myLocation, Class<?> targetClass, int radius) {
         for (int i = 1; i < radius; i++) {
             for (Location targetLocation : world.getSurroundingTiles(myLocation, i)) {
@@ -164,5 +174,9 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
     protected void moveTo(Object me, Location tile) {
         world.move(me, tile);
         world.setCurrentLocation(tile);
+    }
+
+    protected boolean isOnBurrow(Location burrowLocation, Location myLocation) {
+        return burrowLocation != null && myLocation.hashCode() == burrowLocation.hashCode();
     }
 }

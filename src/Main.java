@@ -30,7 +30,8 @@ public class Main {
         Program p = new Program(size, displaySize, delay);
         World world = p.getWorld();
 
-        Spawner.spawnObject(fileValues, size, world,p);
+        Spawner spawner = new Spawner(world, p, size);
+        spawner.spawnObject(fileValues);
         p.show();
 
         for (int i = 0; i < 200; i++) {

@@ -7,7 +7,7 @@ import packages.SpawnableObjects;
 
 public class Burrow extends SpawnableObjects implements NonBlocking {
 
-    public Burrow(World world, Program p) {
-        super(world,p,"hole-small");
+    public Burrow(World world, Program p, String image) {
+        super(world,p,image);
     }
 }

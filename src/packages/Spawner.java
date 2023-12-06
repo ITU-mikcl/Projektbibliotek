@@ -15,19 +15,25 @@ import packages.animals.*;
 
 
 public class Spawner{
+    public static ArrayList<WolfPack> wolfPacks = new ArrayList<>();
     public static HashSet<String> animals = new HashSet<>(Arrays.asList("rabbit","wolf"));
-    public static void spawnObject(ArrayList<String> fileValues, int size, World world, Program p) {
+    public static Random rand = new Random();
+    public static Wolf wolfCurrent;
+    public static World world;
+    public static Program p;
+    public static int size;
 
+    public Spawner(World world, Program p, int size) {
+        this.world = world;
+        this.p = p;
+        this.size = size;
+    }
+
+    public static void spawnObject(ArrayList<String> fileValues) {
         String objToSpawn;
         int lowerBound;
         int upperBound;
         int amountToSpawn;
-
-        Random rand = new Random();
-
-        Wolf wolfCurrent;
-        ArrayList<WolfPack> wolfPacks = new ArrayList<>();
-
 
         for (int i = 1 ; i < fileValues.size(); i++){
             objToSpawn = fileValues.get(i).split(" ")[0];
@@ -48,18 +54,7 @@ public class Spawner{
                 Location l = new Location(x, y);
 
                     if(objToSpawn.equals("wolf")){
-                        while (!world.isTileEmpty(l)) {
-                            x = rand.nextInt(size);
-                            y = rand.nextInt(size);
-                            l = new Location(x, y);
-                        }
-                        if(k==0){
-                            wolfCurrent = new Wolf(world, p, true, wolfPacks.size());
-                        }else{
-                            wolfCurrent = new Wolf(world, p, false, wolfPacks.size());
-                        }
-                        wolfPacks.get(wolfPacks.size()-1).addWolf(wolfCurrent);
-                        world.setTile(l, wolfCurrent);
+                        spawnWolf(l, x, y, size, k);
                     } else {
                         spawnObject(objToSpawn, world,p,size, animals.contains(objToSpawn));
                     }
@@ -67,6 +62,22 @@ public class Spawner{
             }
         }
     }
+
+    public static void spawnWolf(Location l, int x, int y, int size, int spawnALeader) {
+        while (!world.isTileEmpty(l)) {
+            x = rand.nextInt(size);
+            y = rand.nextInt(size);
+            l = new Location(x, y);
+        }
+        if(spawnALeader==0){
+            wolfCurrent = new Wolf(world, p, true, wolfPacks.size() - 1);
+        }else{
+            wolfCurrent = new Wolf(world, p, false, wolfPacks.size() - 1);
+        }
+        wolfPacks.get(wolfPacks.size() - 1).addWolf(wolfCurrent);
+        world.setTile(l, wolfCurrent);
+    }
+
     private static void spawnObject(String className, World world, Program p, int size, boolean isBlocking) {
         if(animals.contains(className)){
             className = "packages.animals." + Character.toUpperCase(className.charAt(0)) + className.substring(1);
@@ -101,5 +112,9 @@ public class Spawner{
             } catch (Exception e) {
                 System.out.println(e);
             }
+        }
+
+        public static WolfPack getMyWolfpack(int myWolfPack) {
+            return wolfPacks.get(myWolfPack);
         }
 }
