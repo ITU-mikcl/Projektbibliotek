@@ -5,6 +5,7 @@ import itumulator.executable.Program;
 import itumulator.world.Location;
 import itumulator.world.World;
 import packages.SpawnableObjects;
+import packages.terrain.Grass;
 
 import javax.swing.table.TableRowSorter;
 import java.util.Set;
@@ -23,6 +24,31 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
         this.speed = speed;
         this.hunger = hunger;
     }
+    protected void lookForGrass(Location myLocation) {
+        try {
+            Object standingOn = world.getNonBlocking(world.getLocation(this));
+
+            if (standingOn instanceof Grass) {
+                Grass standingOnGrass = (Grass) standingOn;
+                eat(standingOnGrass);
+            } else {
+                moveToLocation(myLocation, lookForNonBlocking(myLocation, Grass.class, sizeOfWorld));
+            }
+        } catch (IllegalArgumentException e) {
+            moveToLocation(myLocation, lookForNonBlocking(myLocation, Grass.class, sizeOfWorld));
+        }
+    }
+    public void eat(Grass grass) {
+        hunger += 5;
+        grass.decompose();
+    }
+    protected void lookForPrey(Animal prey){
+        try {
+            prey = (Rabbit) world.getTile(lookForBlocking(myLocation, Rabbit.class));
+        } catch (NullPointerException e) {}
+    }
+
+
 
     protected boolean isAdult() {
         if (!isAdult && stepsSinceSpawned > 60) {
@@ -83,6 +109,19 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
             if (!world.isTileEmpty(targetLocation)
                     && targetClass.isInstance(world.getTile(targetLocation))){
                 return targetLocation;
+            }
+        }
+        return null;
+    }
+
+    protected Object lookForClosestFood(Location myLocation){
+        Object objectOnTile;
+        for(int i = 0; i < sizeOfWorld; i++){
+            for(Location location : world.getSurroundingTiles(myLocation, i)){
+                objectOnTile = world.getTile(location);
+                if(objectOnTile instanceof Grass || objectOnTile instanceof Rabbit){
+                    return objectOnTile;
+                }
             }
         }
         return null;

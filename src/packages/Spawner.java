@@ -16,7 +16,7 @@ import packages.animals.*;
 
 public class Spawner{
     public static ArrayList<WolfPack> wolfPacks = new ArrayList<>();
-    public static HashSet<String> animals = new HashSet<>(Arrays.asList("rabbit","wolf"));
+    public static HashSet<String> animals = new HashSet<>(Arrays.asList("rabbit","wolf","bear"));
     public static Random rand = new Random();
     public static Wolf wolfCurrent;
     public static World world;

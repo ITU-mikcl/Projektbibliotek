@@ -9,7 +9,7 @@ import packages.FileReader;
 import packages.Spawner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args){
         int size;
         int delay = 500;
         int displaySize = 800;
@@ -34,7 +34,7 @@ public class Main {
         spawner.spawnObject(fileValues);
         p.show();
 
-        for (int i = 0; i < 200; i++) {
+        for (int i = 0; i < 1000; i++) {
             p.simulate();
         }
     }

@@ -52,7 +52,7 @@ public class Wolf extends Animal implements Actor {
                                 }
                             }
                             if (hunger <= 10) {
-                                lookForPrey();
+                                lookForPrey(prey);
                                 if (prey != null) {
                                     killPrey(prey);
                                 }
@@ -85,12 +85,7 @@ public class Wolf extends Animal implements Actor {
         }
     }
 
-    private void lookForPrey(){
-        try {
-            prey = (Rabbit) world.getTile(lookForBlocking(myLocation, Rabbit.class));
-        } catch (NullPointerException e) {
-        }
-    }
+
 
     private void killPrey(Animal prey) {
         try{

@@ -30,9 +30,10 @@ public class Rabbit extends Animal implements Actor {
                         world.setTile(getEmptyTile(burrowLocation), this);
                     } else {
                         myLocation = world.getLocation(this);
-
+                        Object predator;
                         for(Location location : world.getSurroundingTiles(2)){
-                            if(world.getTile(location) instanceof Wolf){
+                            predator = world.getTile(location);
+                            if(predator instanceof Wolf || predator instanceof Bear){
                                 moveTo(this, nextOppositeTile(myLocation, location, world.getSurroundingTiles()));
                                 isBeingChased = true;
                                 break;
@@ -44,8 +45,8 @@ public class Rabbit extends Animal implements Actor {
                                 Location partnerLocation = lookForBlocking(myLocation, Rabbit.class);
                                 if (partnerLocation != null){
                                     lookForPartner(partnerLocation);
-                                }else{lookForFood();}
-                            }else{lookForFood();}
+                                }else{lookForGrass(myLocation);}
+                            }else{lookForGrass(myLocation);}
                         }
                     }
                 } else {
@@ -62,12 +63,6 @@ public class Rabbit extends Animal implements Actor {
             }
         }
     }
-
-    public void eat(Grass grass) {
-        hunger += 5;
-        grass.decompose();
-    }
-
     private void lookForPartner(Location partnerLocation) {
         for(Location surroundingTile : world.getSurroundingTiles()){
             if(surroundingTile.hashCode() == partnerLocation.hashCode()){
@@ -86,20 +81,7 @@ public class Rabbit extends Animal implements Actor {
         }
     }
 
-    private void lookForFood() {
-        try {
-            Object standingOn = world.getNonBlocking(world.getLocation(this));
 
-            if (standingOn instanceof Grass) {
-                Grass standingOnGrass = (Grass) standingOn;
-                eat(standingOnGrass);
-            } else {
-                moveToLocation(myLocation, lookForNonBlocking(myLocation, Grass.class, sizeOfWorld));
-            }
-        } catch (IllegalArgumentException e) {
-            moveToLocation(myLocation, lookForNonBlocking(myLocation, Grass.class, sizeOfWorld));
-        }
-    }
 
     private void lookForHole() {
         if (burrowLocation == null) {
@@ -107,7 +89,7 @@ public class Rabbit extends Animal implements Actor {
 
             if (burrowLocation == null) {
                 if (world.containsNonBlocking(myLocation)) {
-                    lookForFood();
+                    lookForGrass(myLocation);
                 } else {
                     world.setTile(myLocation, new Burrow(world, p, "hole-small"));
                     burrowLocation = myLocation;
