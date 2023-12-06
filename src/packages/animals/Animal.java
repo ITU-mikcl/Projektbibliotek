@@ -24,6 +24,7 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
         this.speed = speed;
         this.hunger = hunger;
     }
+
     protected void lookForGrass(Location myLocation) {
         try {
             Object standingOn = world.getNonBlocking(world.getLocation(this));
@@ -38,17 +39,19 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
             moveToLocation(myLocation, lookForNonBlocking(myLocation, Grass.class, sizeOfWorld));
         }
     }
+
     public void eat(Grass grass) {
         hunger += 5;
         grass.decompose();
     }
-    protected void lookForPrey(Animal prey){
+
+    protected Rabbit lookForPrey(Location myLocation){
         try {
-            prey = (Rabbit) world.getTile(lookForBlocking(myLocation, Rabbit.class));
-        } catch (NullPointerException e) {}
+            return (Rabbit) world.getTile(lookForBlocking(myLocation, Rabbit.class));
+        } catch (NullPointerException e) {
+            return null;
+        }
     }
-
-
 
     protected boolean isAdult() {
         if (!isAdult && stepsSinceSpawned > 60) {

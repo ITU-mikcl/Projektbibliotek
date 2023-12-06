@@ -25,31 +25,34 @@ public class Bear extends Animal implements Actor {
                     if (!world.isOnTile(this)) {
 
                     }
-                    myLocation = world.getLocation(this);
-                    if (lookForClosestFood(myLocation) instanceof Rabbit){
-                        lookForPrey(prey);
-                        if (prey != null) {
-                            killPrey(prey);
-                        }
-                    } else{
-                        lookForGrass(myLocation);
-                    }
 
+                    myLocation = world.getLocation(this);
+
+                    if (prey != null) {
+                        killPrey();
+                    } else {
+                        if (lookForClosestFood(myLocation) instanceof Rabbit) {
+                            prey = lookForPrey(myLocation);
+                        } else {
+                            lookForGrass(myLocation);
+                        }
+                    }
                 }
             }
         }
     }
 
-    private void killPrey(Animal prey) {
+    private void killPrey() {
         try{
             Location anyBlockingLocation = lookForAnyBlocking(myLocation, prey.getClass(), 1);
             Set<Location> surroundingTiles = world.getSurroundingTiles(myLocation);
+
             for(Location surroundingTile : surroundingTiles) {
                 if (anyBlockingLocation != null) {
                     if (surroundingTile.hashCode() == anyBlockingLocation.hashCode()) {
                         die(prey);
                         hunger += 5;
-                        this.prey = null;
+                        prey = null;
                         return;
                     }
                 }

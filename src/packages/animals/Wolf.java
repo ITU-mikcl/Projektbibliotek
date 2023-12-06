@@ -9,6 +9,7 @@ import packages.Spawner;
 import packages.terrain.Burrow;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -52,9 +53,9 @@ public class Wolf extends Animal implements Actor {
                                 }
                             }
                             if (hunger <= 10) {
-                                lookForPrey(prey);
+                                prey = lookForPrey(myLocation);
                                 if (prey != null) {
-                                    killPrey(prey);
+                                    killPrey();
                                 }
                             }
                         } else {
@@ -87,16 +88,17 @@ public class Wolf extends Animal implements Actor {
 
 
 
-    private void killPrey(Animal prey) {
+    private void killPrey() {
         try{
             Location anyBlockingLocation = lookForAnyBlocking(myLocation, prey.getClass(), 1);
             Set<Location> surroundingTiles = world.getSurroundingTiles(myLocation);
+
             for(Location surroundingTile : surroundingTiles) {
                 if (anyBlockingLocation != null) {
                     if (surroundingTile.hashCode() == anyBlockingLocation.hashCode()) {
                         die(prey);
                         changeHungerForPack(10);
-                        this.prey = null;
+                        prey = null;
                         return;
                     }
                 }
@@ -192,7 +194,7 @@ public class Wolf extends Animal implements Actor {
     }
 
     private void reproduce() {
-        if (isAdult() && hunger >= 5) {
+        if (isAdult() && hunger >= 5 && getAllWolvesInMyPack(sizeOfWorld).size() > 2) {
             newWolf = new Wolf(world, p, false, myPack);
             Spawner.getMyWolfpack(myPack).addWolf(newWolf);
             newWolf.burrowLocation = burrowLocation;

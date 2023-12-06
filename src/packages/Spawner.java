@@ -35,19 +35,34 @@ public class Spawner{
         int upperBound;
         int amountToSpawn;
 
+        int xCoords;
+        int yCoords;
+
         for (int i = 1 ; i < fileValues.size(); i++){
             objToSpawn = fileValues.get(i).split(" ")[0];
             if (objToSpawn.equals("wolf")){
                 wolfPacks.add(new WolfPack(world,p,wolfPacks.size()));
             }
-            if (fileValues.get(i).contains("-")) {
-                lowerBound = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[0]);
-                upperBound = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[1]);
 
-                amountToSpawn = rand.nextInt(upperBound-lowerBound) + lowerBound;
+            if (!objToSpawn.equals("bear")) {
+                if (fileValues.get(i).contains("-")) {
+                    lowerBound = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[0]);
+                    upperBound = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[1]);
+
+                    amountToSpawn = rand.nextInt(upperBound-lowerBound) + lowerBound;
+                } else {
+                    amountToSpawn = Integer.parseInt(fileValues.get(i).split(" ")[1]);
+                }
             } else {
-                amountToSpawn = Integer.parseInt(fileValues.get(i).split(" ")[1]);
+                    lowerBound = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[0]);
+                    upperBound = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[1]);
+
+                    amountToSpawn = rand.nextInt(upperBound-lowerBound) + lowerBound;
+
+                    xCoords = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[1].split(",")[0]);
+                    yCoords = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[1].split(",")[1]);
             }
+
             for (int k = 0; k < amountToSpawn; k++) {
                 int x = rand.nextInt(size);
                 int y = rand.nextInt(size);
