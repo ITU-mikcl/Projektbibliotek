@@ -14,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 
 import itumulator.display.overlay.OverlayCanvas;
 import itumulator.display.utility.DayNightHelper;
@@ -39,11 +40,10 @@ public class Frame extends JFrame {
 
         // Setup Frame
         setResizable(false);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("Itumulator");
         setSize(pixel_size+16, pixel_size+36);
         setLocationRelativeTo(null);
-
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         // Set layered pane
         layeredPane = new JLayeredPane();
         add(layeredPane);

@@ -11,13 +11,13 @@ import packages.terrain.Burrow;
 import java.awt.*;
 
 public class Rabbit extends Animal implements Actor {
-    private int hunger = 50;
+    private int hunger = 10;
     private Location myLocation;
     private Location burrowLocation = null;
     private boolean timeToReproduce = false;
     final String[] images = {"rabbit-small", "rabbit-small-sleeping", "rabbit-large", "rabbit-sleeping"};
     public Rabbit(World world, Program p) {
-        super(world, p, "rabbit-small", 1);
+        super(world, p, "rabbit-small", 2);
     }
 
     @Override
@@ -29,18 +29,20 @@ public class Rabbit extends Animal implements Actor {
                 if (world.isDay()) {
                     if (!world.isOnTile(this)) {
                         world.setTile(getEmptyTile(burrowLocation), this);
-                    }
-
-                    myLocation = world.getLocation(this);
-
-                    if (isAdult() && hunger >= 5) {
-                        lookForPartner();
                     } else {
-                        lookForFood();
+                        myLocation = world.getLocation(this);
+
+                        if (isAdult() && hunger >= 5) {
+                            lookForPartner();
+                        } else {
+                            lookForFood();
+                        }
                     }
                 } else {
                     if (world.isOnTile(this)) {
-                        if (myLocation != burrowLocation){
+                        myLocation = world.getLocation(this);
+
+                        if (!isOnBurrow()){
                             lookForHole();
                         } else {
                             world.remove(this);
@@ -56,8 +58,16 @@ public class Rabbit extends Animal implements Actor {
         }
     }
 
+    protected boolean isOnBurrow() {
+        if (burrowLocation == null || myLocation.hashCode() != burrowLocation.hashCode()) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     public void eat(Grass grass) {
-        hunger++;
+        hunger += 5;
         grass.decompose();
     }
 
@@ -71,7 +81,7 @@ public class Rabbit extends Animal implements Actor {
     private void reproduce() {
         for (Location birthLocation : world.getEmptySurroundingTiles()) {
             world.setTile(birthLocation, new Rabbit(world, p));
-            hunger -= 3;
+            hunger -= 5;
             timeToReproduce = false;
             break;
         }
@@ -85,28 +95,33 @@ public class Rabbit extends Animal implements Actor {
                 Grass standingOnGrass = (Grass) standingOn;
                 eat(standingOnGrass);
             } else {
-                moveToTile(myLocation, Grass.class);
+                moveToLocation(myLocation, lookForNonBlocking(myLocation, Grass.class, sizeOfWorld));
             }
         } catch (IllegalArgumentException e) {
-            moveToTile(myLocation, Grass.class);
+            moveToLocation(myLocation, lookForNonBlocking(myLocation, Grass.class, sizeOfWorld));
         }
     }
 
     private void lookForHole() {
         if (burrowLocation == null) {
-            burrowLocation = lookForNonBlocking(myLocation, Burrow.class);
+            burrowLocation = lookForNonBlocking(myLocation, Burrow.class, 3);
 
             if (burrowLocation == null) {
-                world.setTile(myLocation, new Burrow(world, p));
-                burrowLocation = myLocation;
+                if (world.containsNonBlocking(myLocation)) {
+                    lookForFood();
+                } else {
+                    world.setTile(myLocation, new Burrow(world, p));
+                    burrowLocation = myLocation;
+                }
             }
+        } else {
+            moveToLocation(myLocation, burrowLocation);
+            myLocation = world.getLocation(this);
         }
 
-        moveToTile(myLocation, Burrow.class);
-        myLocation = burrowLocation;
     }
 
     public DisplayInformation getInformation() {
-        return new DisplayInformation(Color.white, images[getState()]);
+        return new DisplayInformation(Color.white, images[getState(isOnBurrow())]);
     }
 }

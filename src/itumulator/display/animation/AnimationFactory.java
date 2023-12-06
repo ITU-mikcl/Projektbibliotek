@@ -61,6 +61,9 @@ public class AnimationFactory {
         ePrime = world.getEntities();
         isDayPrime = world.isDay();
         
+        if(e == null) return new ArrayList<>();
+        
+
         List<Animation> animations = new ArrayList<>();
 
         for (Entry<Object, Location> kvp : e.entrySet()) {
@@ -138,7 +141,7 @@ public class AnimationFactory {
         }
 
         // update e to e'
-        e = ePrime;
+        if(ePrime != null) e = ePrime;
         isDay = isDayPrime;
         ePrime = null;
         return sets;

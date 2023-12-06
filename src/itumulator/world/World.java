@@ -169,7 +169,7 @@ public class World {
     /**
      * Get immediate tiles surrounding the current location (as defined by
      * {@link getCurrentLocation() getCurrentLocation} and {@link setCurrentLocation(Location current)
-     * setLocation}). 
+     * setLocation}). The method only returns existing locations within the map.
      * 
      * @return set of immediate surrounding locations.
      * @throws IllegalStateException
@@ -183,7 +183,8 @@ public class World {
     /**
      * Get tiles (up to the radius provided) surrounding the current location which
      * are not filled (as defined by {@link getCurrentLocation() getCurrentLocation} and
-     * {@link setCurrentLocation(Location current) setCurrentLocation}).
+     * {@link setCurrentLocation(Location current) setCurrentLocation}). 
+     * The method only returns existing locations within the map.
      * 
      * @param radius the number of locations to include in each direction.
      * @return set of surrounding locations.
@@ -380,6 +381,7 @@ public class World {
      * radius of 1 tile. Tiles outside the bounds of the world are excluded.
      * This method is useful for operations where the context of an object includes
      * its immediate neighbors, such as movement or interaction checks.
+     * The method only returns existing locations within the map.
      * 
      * @param location The central location for which surrounding tiles are to be found.
      * @return A set of locations immediately surrounding the specified location.
@@ -396,6 +398,7 @@ public class World {
      * Tiles outside the world's bounds are excluded.
      * This method is particularly useful for broader area checks or
      * when an operation affects multiple tiles around a point.
+     * The method only returns existing locations within the map.
      * 
      * @param location The  location for which surrounding tiles are to be found.
      * @param radius   The radius within which to find surrounding tiles. Must be non-negative.

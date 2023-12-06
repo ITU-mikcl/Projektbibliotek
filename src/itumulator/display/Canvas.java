@@ -50,6 +50,16 @@ public class Canvas extends JPanel {
     
     public Canvas(World world, int size, boolean startIso) {
         super();
+
+        // 1 main thread
+        // 1 simulator thread
+        // 1 java thread
+        // 1 overlay rendering thread
+        // 1 buffer for safety
+        // rest for rendering
+        int availableProcessors = Runtime.getRuntime().availableProcessors();
+        executor = Executors.newFixedThreadPool(availableProcessors > 5 ? availableProcessors - 5 : 3);
+
         setLayout(new BorderLayout());
         Dimension d = new Dimension(size, size);
         setPreferredSize(d);
@@ -67,15 +77,6 @@ public class Canvas extends JPanel {
         BufferedImage img = ImageResourceCache.Instance().getImage("base");
         isoBackgroundImage = ImageUtility.getScaledImage(img, IsomorphicCoordinateFactory.Instance().getDisplaySize(), IsomorphicCoordinateFactory.Instance().getDisplaySize());
         setIsomorphic(startIso);
-
-        // 1 main thread
-        // 1 simulator thread
-        // 1 java thread
-        // 1 overlay rendering thread
-        // 1 buffer for safety
-        // rest for rendering
-        int availableProcessors = Runtime.getRuntime().availableProcessors();
-        executor = Executors.newFixedThreadPool(availableProcessors > 5 ? availableProcessors - 5 : 3);
     }
 
     /**
@@ -92,7 +93,7 @@ public class Canvas extends JPanel {
         try {
             if(isomorphic) renderPermits.acquire();
         } catch (Exception e){{
-            System.out.println("Error acquiring render permit (interrupted)");
+            // error might occur when pausing when trying to acquire permit.
         }}
         
     }
@@ -107,6 +108,10 @@ public class Canvas extends JPanel {
         if(lastView != isomorphic) {
             lastView = isomorphic;
             queue.clear();
+            int available = renderPermits.availablePermits();
+            int missing = RENDER_PERMITS - available;
+            renderPermits.release( missing > 0 ? missing : 0);
+            paintImage();
         }
         // and request an update.
         if (isomorphic){
@@ -150,37 +155,46 @@ public class Canvas extends JPanel {
                     graphics.setColor(new Color(150, 210, 131));
                     graphics.fillPolygon(IsomorphicUtility.getIsoPolygon((IsomorphicCoordinateFactory.Instance().getDisplaySize()/2), IsomorphicCoordinateFactory.Instance().getDisplaySize()/2, IsomorphicCoordinateFactory.Instance().getDisplaySize()/2, IsomorphicCoordinateFactory.Instance().getDisplaySize()/4));
                     graphics.drawImage(future.get(), 0, 0,null);
-                    
                     this.queue.add(img);
                     repaint(); // bad practice, but appears to help rendering time on windows machines
 
                 }
+                System.gc();
             } catch (Exception e) {
                 // This can happen because we start tasks and
                 // futures from within the simulator thread
                 // and it can't stacktrace and locate
                 // the exception error
                 if (e.getMessage() != null){
-                    System.out.println("Canvas thread error: " + e.getMessage() );
+                    if(e instanceof NullPointerException && e.getMessage().contains("img")){
+                        // image not loaded yet...
+                    } else {   
+                        System.out.println("Canvas thread error: " + e.getMessage() );
+                    }
+                    
                 }
             }
         } else {
             /** For the non isomorphic view we simply use the colors to paint each square */
-            Image img = createImage(size, size);
-            this.queue.add(img);
-            graphics = img.getGraphics();
+            try { 
+                Image img = createImage(size, size);
+                this.queue.add(img);
+                graphics = img.getGraphics();
 
-            graphics.setColor(COLOR_EMPTY);
-            graphics.fillRect(0, 0, size, size);
-            int tiles = world.getSize();
-            for (int y = tiles-1; y >= 0; y--) {
-                for (int x = 0; x < tiles; x++) {
-                    Location l = new Location(x, y);
-                    Object o = world.getTile(l);
-                    drawGridElement(l, o);
+                graphics.setColor(COLOR_EMPTY);
+                graphics.fillRect(0, 0, size, size);
+                int tiles = world.getSize();
+                for (int y = tiles-1; y >= 0; y--) {
+                    for (int x = 0; x < tiles; x++) {
+                        Location l = new Location(x, y);
+                        Object o = world.getTile(l);
+                        drawGridElement(l, o);
+                    }
                 }
+                repaint();
+            } catch (Exception e){
+                // error might occur due to too fast image switching
             }
-            repaint();
         }
     }
 

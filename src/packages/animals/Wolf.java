@@ -23,7 +23,8 @@ public class Wolf extends Animal implements Actor {
     }
 
     public DisplayInformation getInformation() {
-        return new DisplayInformation(Color.white, images[super.getState()]);
+        //return new DisplayInformation(Color.white, images[super.getState()]);
+        return new DisplayInformation(Color.white, images[0]);
     }
 
     public void act(World world) {

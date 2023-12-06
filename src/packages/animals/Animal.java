@@ -29,17 +29,17 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
         return isAdult;
     }
 
-    protected int getState() {
+    protected int getState(Boolean isOnBurrow) {
         if(isAdult()) {
-            if (world.isDay()) {
-                return 2;
-            } else {
+            if (world.isNight() && isOnBurrow) {
                 return 3;
+            } else {
+                return 2;
             }
-        } else if (world.isDay()) {
-            return 0;
-        } else {
+        } else if (world.isNight() && isOnBurrow) {
             return 1;
+        } else {
+            return 0;
         }
     }
 
@@ -56,27 +56,23 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
         stepsSinceSpawned++;
         currentTime = world.getCurrentTime();
 
-        if (world.isOnTile(this)) {
-            if (currentTime == 0) {
-                getInformation();
-            } else if (currentTime == 10) {
-                getInformation();
-            }
-        }
-
         if (hunger == 0) {
             die(me);
         }
 
-        return --hunger;
+        if (stepsSinceSpawned % 5 == 0) {
+            return --hunger;
+        } else {
+            return hunger;
+        }
     }
 
     protected boolean canIAct() {
         return stepsSinceSpawned % speed == 0;
     }
 
-    protected Location lookForNonBlocking(Location myLocation, Class<?> targetClass) {
-        for (int i = 1; i < sizeOfWorld; i++) {
+    protected Location lookForNonBlocking(Location myLocation, Class<?> targetClass, int radius) {
+        for (int i = 1; i < radius; i++) {
             for (Location targetLocation : world.getSurroundingTiles(myLocation, i)) {
                 if (world.containsNonBlocking(targetLocation)
                         && targetClass.isInstance(world.getNonBlocking(targetLocation))
@@ -102,13 +98,35 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
         return null;
     }
 
-    public void moveToTile(Location myLocation, Class<?> targetClass){
+    private Location nextTile(Location myLocation, Location targetLocation, Set<Location> surroundingTiles) {
+        double minDistance = Double.POSITIVE_INFINITY;
+        Location tileToMoveTo = myLocation;
+
+        for (Location tile : surroundingTiles){
+            if (world.isTileEmpty(tile)) {
+                double x1 = targetLocation.getX();
+                double y1 = targetLocation.getY();
+                double x2 = tile.getX();
+                double y2 = tile.getY();
+                double surroundingDistance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+
+                if (surroundingDistance < minDistance) {
+                    minDistance = surroundingDistance;
+                    tileToMoveTo = tile;
+                }
+            }
+        }
+
+        return tileToMoveTo;
+    }
+
+    public void moveToLocation(Location myLocation, Location targetLocation){
         Set<Location> surroundingTiles = world.getSurroundingTiles(myLocation);
 
         for (Location tile : surroundingTiles) {
             if (world.isTileEmpty(tile)) {
                 try {
-                    if (world.getNonBlocking(tile).getClass() == targetClass) {
+                    if (tile == targetLocation) {
                         moveTo(this, tile);
                         return;
                     }
@@ -118,28 +136,7 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
             }
         }
 
-        double minDistance = Double.POSITIVE_INFINITY;
-        Location tileToMoveTo = myLocation;
-        Location nonBlockingLocation = lookForNonBlocking(myLocation, targetClass);
-
-        if (nonBlockingLocation != null) {
-            for (Location tile : surroundingTiles){
-                if (world.isTileEmpty(tile)) {
-                    double x1 = nonBlockingLocation.getX();
-                    double y1 = nonBlockingLocation.getY();
-                    double x2 = tile.getX();
-                    double y2 = tile.getY();
-                    double surroundingDistance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-
-                    if (surroundingDistance < minDistance) {
-                        minDistance = surroundingDistance;
-                        tileToMoveTo = tile;
-                    }
-                }
-            }
-        }
-
-        moveTo(this, tileToMoveTo);
+        moveTo(this, nextTile(myLocation, targetLocation, surroundingTiles));
     }
 
     protected Location getEmptyTile(Location theLocation) {
