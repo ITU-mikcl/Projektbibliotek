@@ -11,7 +11,7 @@ import packages.Spawner;
 public class Main {
     public static void main(String[] args) {
         int size;
-        int delay = 1000;
+        int delay = 500;
         int displaySize = 800;
 
         ArrayList<String> fileValues = new ArrayList<>();

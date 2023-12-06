@@ -14,7 +14,7 @@ public class Rabbit extends Animal implements Actor {
     private int hunger = 10;
     private Location myLocation;
     private Location burrowLocation = null;
-    private boolean timeToReproduce = false;
+
     final String[] images = {"rabbit-small", "rabbit-small-sleeping", "rabbit-large", "rabbit-sleeping"};
     public Rabbit(World world, Program p) {
         super(world, p, "rabbit-small", 2);
@@ -33,10 +33,11 @@ public class Rabbit extends Animal implements Actor {
                         myLocation = world.getLocation(this);
 
                         if (isAdult() && hunger >= 5) {
-                            lookForPartner();
-                        } else {
-                            lookForFood();
-                        }
+                            Location partnerLocation = lookForBlocking(myLocation, Rabbit.class);
+                            if (partnerLocation != null){
+                                lookForPartner(partnerLocation);
+                            }else{lookForFood();}
+                        }else{lookForFood();}
                     }
                 } else {
                     if (world.isOnTile(this)) {
@@ -49,21 +50,12 @@ public class Rabbit extends Animal implements Actor {
                         }
                     }
                 }
-            } else {
-                if (timeToReproduce) {
-                    reproduce();
-                }
             }
-
         }
     }
 
     protected boolean isOnBurrow() {
-        if (burrowLocation == null || myLocation.hashCode() != burrowLocation.hashCode()) {
-            return false;
-        } else {
-            return true;
-        }
+        return burrowLocation != null && myLocation.hashCode() == burrowLocation.hashCode();
     }
 
     public void eat(Grass grass) {
@@ -71,18 +63,20 @@ public class Rabbit extends Animal implements Actor {
         grass.decompose();
     }
 
-    private void lookForPartner() {
-        if (lookForBlocking(myLocation, Rabbit.class) != null) {
-            timeToReproduce = true;
-            reproduce();
+    private void lookForPartner(Location partnerLocation) {
+        for(Location surroundingTile : world.getSurroundingTiles()){
+            if(surroundingTile.hashCode() == partnerLocation.hashCode()){
+                reproduce();
+                return;
+            }
         }
+        moveToLocation(myLocation, partnerLocation);
     }
 
     private void reproduce() {
         for (Location birthLocation : world.getEmptySurroundingTiles()) {
             world.setTile(birthLocation, new Rabbit(world, p));
             hunger -= 5;
-            timeToReproduce = false;
             break;
         }
     }
@@ -104,7 +98,7 @@ public class Rabbit extends Animal implements Actor {
 
     private void lookForHole() {
         if (burrowLocation == null) {
-            burrowLocation = lookForNonBlocking(myLocation, Burrow.class, 3);
+            burrowLocation = lookForAnyBlocking(myLocation, Burrow.class, 3);
 
             if (burrowLocation == null) {
                 if (world.containsNonBlocking(myLocation)) {

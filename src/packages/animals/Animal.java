@@ -13,7 +13,6 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
     private int stepsSinceSpawned = 0;
     private int speed;
     private boolean isAdult = false;
-    private int currentTime = 0;
     private boolean isDead = false;
     public Animal (World world, Program p, String image, int speed){
         super(world,p,image);
@@ -54,7 +53,6 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
 
     protected int statusCheck(Object me, int hunger) {
         stepsSinceSpawned++;
-        currentTime = world.getCurrentTime();
 
         if (hunger == 0) {
             die(me);
@@ -71,6 +69,15 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
         return stepsSinceSpawned % speed == 0;
     }
 
+    protected Location lookForAnyBlocking(Location myLocation, Class<?> targetClass, int radius){
+        for (Location targetLocation : world.getSurroundingTiles(myLocation, radius)) {
+            if (!world.isTileEmpty(targetLocation)
+                    && targetClass.isInstance(world.getTile(targetLocation))){
+                return targetLocation;
+            }
+        }
+        return null;
+    }
     protected Location lookForNonBlocking(Location myLocation, Class<?> targetClass, int radius) {
         for (int i = 1; i < radius; i++) {
             for (Location targetLocation : world.getSurroundingTiles(myLocation, i)) {
@@ -89,7 +96,6 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
             for (Location targetLocation: world.getSurroundingTiles(myLocation, i)) {
                 if (targetClass.isInstance(world.getTile(targetLocation)) && !world.getEmptySurroundingTiles(targetLocation).isEmpty()) {
                     for (Location partnerLocationEmptySurroundingTile: world.getEmptySurroundingTiles(targetLocation)){
-                        moveTo(this,partnerLocationEmptySurroundingTile);
                         return targetLocation;
                     }
                 }
