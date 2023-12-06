@@ -9,8 +9,10 @@ import packages.terrain.Grass;
 import packages.terrain.Burrow;
 
 import java.awt.*;
+import java.util.Set;
 
 public class Rabbit extends Animal implements Actor {
+    boolean isBeingChased = false;
     final String[] images = {"rabbit-small", "rabbit-small-sleeping", "rabbit-large", "rabbit-sleeping"};
     public Rabbit(World world, Program p) {
         super(world, p, "rabbit-small", 2, 10);
@@ -18,6 +20,7 @@ public class Rabbit extends Animal implements Actor {
 
     @Override
     public void act(World world) {
+
         hunger = statusCheck(this, hunger);
 
         if (!isDead()) {
@@ -28,12 +31,22 @@ public class Rabbit extends Animal implements Actor {
                     } else {
                         myLocation = world.getLocation(this);
 
-                        if (isAdult() && hunger >= 5) {
-                            Location partnerLocation = lookForBlocking(myLocation, Rabbit.class);
-                            if (partnerLocation != null){
-                                lookForPartner(partnerLocation);
+                        for(Location location : world.getSurroundingTiles(2)){
+                            if(world.getTile(location) instanceof Wolf){
+                                moveTo(this, nextOppositeTile(myLocation, location, world.getSurroundingTiles()));
+                                isBeingChased = true;
+                                break;
+                            }
+                            isBeingChased = false;
+                        }
+                        if (!isBeingChased){
+                            if (isAdult() && hunger >= 5) {
+                                Location partnerLocation = lookForBlocking(myLocation, Rabbit.class);
+                                if (partnerLocation != null){
+                                    lookForPartner(partnerLocation);
+                                }else{lookForFood();}
                             }else{lookForFood();}
-                        }else{lookForFood();}
+                        }
                     }
                 } else {
                     if (world.isOnTile(this)) {

@@ -132,27 +132,46 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
                 }
             }
         }
+        return tileToMoveTo;
+    }
+    protected Location nextOppositeTile(Location myLocation, Location targetLocation, Set<Location> surroundingTiles) {
+        double maxDistance = Double.MIN_VALUE;
+        Location tileToMoveTo = myLocation;
 
+        for (Location tile : surroundingTiles){
+            if (world.isTileEmpty(tile)) {
+                double x1 = targetLocation.getX();
+                double y1 = targetLocation.getY();
+                double x2 = tile.getX();
+                double y2 = tile.getY();
+                double surroundingDistance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+
+                if (surroundingDistance > maxDistance) {
+                    maxDistance = surroundingDistance;
+                    tileToMoveTo = tile;
+                }
+            }
+        }
         return tileToMoveTo;
     }
 
     public void moveToLocation(Location myLocation, Location targetLocation){
-        Set<Location> surroundingTiles = world.getSurroundingTiles(myLocation);
+        if (targetLocation != null){
+            Set<Location> surroundingTiles = world.getSurroundingTiles(myLocation);
+            for (Location tile : surroundingTiles) {
+                if (world.isTileEmpty(tile)) {
+                    try {
+                        if (tile == targetLocation) {
+                            moveTo(this, tile);
+                            return;
+                        }
+                    } catch (IllegalArgumentException e) {
 
-        for (Location tile : surroundingTiles) {
-            if (world.isTileEmpty(tile)) {
-                try {
-                    if (tile == targetLocation) {
-                        moveTo(this, tile);
-                        return;
                     }
-                } catch (IllegalArgumentException e) {
-
                 }
             }
+            moveTo(this, nextTile(myLocation, targetLocation, surroundingTiles));
         }
-
-        moveTo(this, nextTile(myLocation, targetLocation, surroundingTiles));
     }
 
     protected Location getEmptyTile(Location theLocation) {
