@@ -14,7 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Wolf extends Animal implements Actor {
-    private Rabbit prey;
+    private Animal prey;
     private boolean isLeader;
     private final int myPack;
     String[] images = {"wolf-small", "wollfl-small-sleeping", "wolf", "wolf-sleeping"};
@@ -53,7 +53,15 @@ public class Wolf extends Animal implements Actor {
                                 }
                             }
                             if (hunger <= 10) {
-                                prey = lookForPrey(myLocation);
+                                if (allWolvesInPack.size() >= 1) {
+                                    Bear targetBear = lookForBear();
+                                    if (targetBear != null) {
+                                        prey = targetBear;
+                                    }
+                                } else {
+                                    prey = lookForPrey(myLocation);
+                                }
+
                                 if (prey != null) {
                                     killPrey();
                                 }
@@ -86,7 +94,13 @@ public class Wolf extends Animal implements Actor {
         }
     }
 
-
+    private Bear lookForBear(){
+        try {
+            return (Bear) world.getTile(lookForBlocking(myLocation, Bear.class));
+        } catch (NullPointerException e) {
+            return null;
+        }
+    }
 
     private void killPrey() {
         try{
