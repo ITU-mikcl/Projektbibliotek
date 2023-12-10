@@ -33,10 +33,10 @@ public class Spawner{
         String objToSpawn;
         int lowerBound;
         int upperBound;
-        int amountToSpawn;
-
-        int xCoords;
-        int yCoords;
+        int amountToSpawn = 0;
+        int xCoords = 0;
+        int yCoords = 0;
+        boolean hasCoords = false;
 
         for (int i = 1 ; i < fileValues.size(); i++){
             objToSpawn = fileValues.get(i).split(" ")[0];
@@ -47,9 +47,7 @@ public class Spawner{
             }
             if (objToSpawn.equals("wolf")){
                 wolfPacks.add(new WolfPack(world,p,wolfPacks.size()));
-            }
-
-            if (!objToSpawn.equals("bear")) {
+            } else if (!objToSpawn.equals("bear")) {
                 if (fileValues.get(i).contains("-")) {
                     lowerBound = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[0]);
                     upperBound = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[1]);
@@ -59,13 +57,21 @@ public class Spawner{
                     amountToSpawn = Integer.parseInt(fileValues.get(i).split(" ")[1]);
                 }
             } else {
+                if (fileValues.get(i).contains("-")) {
                     lowerBound = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[0]);
                     upperBound = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[1]);
 
                     amountToSpawn = rand.nextInt(upperBound-lowerBound) + lowerBound;
+                } else {
+                    amountToSpawn = Integer.parseInt(fileValues.get(i).split(" ")[1]);
+                }
 
-                    xCoords = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[1].split(",")[0]);
-                    yCoords = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[1].split(",")[1]);
+                if (fileValues.get(i).contains(",")) {
+                    xCoords = Integer.parseInt(fileValues.get(i).split("[(]")[1].split(",")[0]);
+                    yCoords = Integer.parseInt(fileValues.get(i).split(",")[1].split("[)]")[0]);
+
+                    hasCoords = true;
+                }
             }
 
             for (int k = 0; k < amountToSpawn; k++) {
@@ -75,6 +81,12 @@ public class Spawner{
 
                     if(objToSpawn.equals("wolf")){
                         spawnWolf(l, x, y, size, k);
+                    } else if (objToSpawn.equals("bear")) {
+                        if (hasCoords) {
+                            spawnBear(l, x, y, new Location(xCoords, yCoords));
+                        } else {
+                            spawnBear(l, x, y, new Location(x, y));
+                        }
                     } else {
                         spawnObject(objToSpawn, world,p,size, animals.contains(objToSpawn));
                     }
@@ -96,6 +108,16 @@ public class Spawner{
         }
         wolfPacks.get(wolfPacks.size() - 1).addWolf(wolfCurrent);
         world.setTile(l, wolfCurrent);
+    }
+
+    private static void spawnBear(Location l, int x, int y, Location centerPoint) {
+        while (!world.isTileEmpty(l)) {
+            x = rand.nextInt(size);
+            y = rand.nextInt(size);
+            l = new Location(x, y);
+        }
+
+        world.setTile(l, new Bear(world, p, world.getSurroundingTiles(l, (world.getSize() / 3))));
     }
 
     private static void spawnObject(String className, World world, Program p, int size, boolean isBlocking) {
