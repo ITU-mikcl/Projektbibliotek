@@ -40,6 +40,11 @@ public class Spawner{
 
         for (int i = 1 ; i < fileValues.size(); i++){
             objToSpawn = fileValues.get(i).split(" ")[0];
+            if (animals.contains(objToSpawn)) {
+                checkSpace(true);
+            } else {
+                checkSpace(false);
+            }
             if (objToSpawn.equals("wolf")){
                 wolfPacks.add(new WolfPack(world,p,wolfPacks.size()));
             }
@@ -126,6 +131,23 @@ public class Spawner{
                 world.setTile(l, obj);
             } catch (Exception e) {
                 System.out.println(e);
+            }
+        }
+        public static void checkSpace(boolean blocking) {
+            if (blocking) {
+                for(Location tile : world.getSurroundingTiles(new Location(0,0),size)) {
+                    if (!world.isTileEmpty(tile)){;
+                        return;
+                    }
+                }
+                throw new IllegalArgumentException("No space for Blocking object");
+            } else {
+                for(Location tile : world.getSurroundingTiles(new Location(0,0),size)) {
+                    if (!world.containsNonBlocking(tile)){;
+                    return;
+                }
+                }
+                throw new IllegalArgumentException("No space for nonBlocking object");
             }
         }
 

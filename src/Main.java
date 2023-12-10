@@ -25,11 +25,12 @@ public class Main {
             }
             reader.close();
         } catch (FileNotFoundException e) {}
-
         size = Integer.parseInt(fileValues.get(0));
+        if (size <= 0) {
+            throw new IllegalArgumentException("World size can't be 0");
+        }
         Program p = new Program(size, displaySize, delay);
         World world = p.getWorld();
-
         Spawner spawner = new Spawner(world, p, size);
         spawner.spawnObject(fileValues);
         p.show();
