@@ -6,6 +6,7 @@ import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.World;
 import packages.terrain.Berry;
+import packages.terrain.Carcass;
 import packages.terrain.Grass;
 
 import java.awt.*;
@@ -22,6 +23,8 @@ public class Bear extends Animal implements Actor {
         this.myTerritory = myTerritory;
     }
     public void act(World world){
+        hunger = super.statusCheck(this, hunger);
+
         if (!isDead()) {
             if (canIAct()) {
                 if (world.isDay()) {
@@ -31,7 +34,7 @@ public class Bear extends Animal implements Actor {
                         myLocation = world.getLocation(this);
 
                         if (prey != null) {
-                            if (world.isOnTile(prey)) {
+                            if (world.contains(prey)) {
                                 if (myTerritory.contains(world.getLocation(prey))) {
                                     killPrey();
                                 } else {
@@ -39,7 +42,7 @@ public class Bear extends Animal implements Actor {
                                 }
                             }
                         } else {
-                            if (lookForClosestFood(myLocation) instanceof Rabbit) {
+                            if (lookForClosestFood(myLocation) instanceof Rabbit || lookForClosestFood(myLocation) instanceof Carcass) {
                                 prey = bearLookForPrey();
                             } else if (!eatBerries()) {
                                 bearLookingForGrass();

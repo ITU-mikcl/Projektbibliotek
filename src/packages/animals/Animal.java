@@ -5,6 +5,7 @@ import itumulator.executable.Program;
 import itumulator.world.Location;
 import itumulator.world.World;
 import packages.SpawnableObjects;
+import packages.terrain.Carcass;
 import packages.terrain.Grass;
 
 import javax.swing.table.TableRowSorter;
@@ -40,14 +41,30 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
         }
     }
 
-    public void eat(Grass grass) {
-        hunger += 5;
-        grass.decompose();
+    public void eat(Object food) {
+
+        if(food instanceof Grass){
+            hunger += 5;
+        } else if (food instanceof Carcass) {
+            if(((Carcass) food).isBig()){
+                hunger += 7;
+            }else{
+                hunger += 4;
+            }
+        }
+        world.delete(food);
     }
 
     protected Rabbit lookForPrey(Location myLocation){
         try {
             return (Rabbit) world.getTile(lookForBlocking(myLocation, Rabbit.class));
+        } catch (NullPointerException e) {
+            return null;
+        }
+    }
+    protected Carcass wolfLookForCarcass(Location myLocation){
+        try {
+            return (Carcass) world.getTile(lookForBlocking(myLocation, Carcass.class));
         } catch (NullPointerException e) {
             return null;
         }
@@ -77,8 +94,17 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
     }
 
     protected void die(Animal me) {
+        Location targetLocation = world.getLocation(me);
         me.isDead = true;
         world.delete(me);
+        Carcass carcass = new Carcass(world,p,"carcass");
+        if(me.getClass() == Rabbit.class){
+            carcass.changeState(0);
+            world.setTile(targetLocation,carcass);
+        }else {
+            world.setTile(targetLocation,carcass);
+        }
+
     }
 
     protected boolean isDead() {
@@ -87,8 +113,7 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
 
     protected int statusCheck(Animal me, int hunger) {
         stepsSinceSpawned++;
-
-        if (hunger == 0) {
+        if (hunger <= 0 && world.isOnTile(me)) {
             die(me);
         }
 

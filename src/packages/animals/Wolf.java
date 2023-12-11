@@ -7,6 +7,7 @@ import itumulator.world.Location;
 import itumulator.world.World;
 import packages.Spawner;
 import packages.terrain.Burrow;
+import packages.terrain.Carcass;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -15,6 +16,8 @@ import java.util.Set;
 
 public class Wolf extends Animal implements Actor {
     private Animal prey;
+
+    private Carcass carcass;
     private boolean isLeader;
     private final int myPack;
     String[] images = {"wolf-small", "wollfl-small-sleeping", "wolf", "wolf-sleeping"};
@@ -53,16 +56,19 @@ public class Wolf extends Animal implements Actor {
                                 }
                             }
                             if (hunger <= 10) {
-                                if (allWolvesInPack.size() >= 1) {
+                                if (allWolvesInPack.size() >= 5) {
                                     Bear targetBear = lookForBear();
                                     if (targetBear != null) {
                                         prey = targetBear;
                                     }
                                 } else {
-                                    prey = lookForPrey(myLocation);
-                                }
-
-                                if (prey != null) {
+                                    carcass = wolfLookForCarcass(myLocation);
+                                    if(prey == null){
+                                        prey = lookForPrey(myLocation);
+                                    }
+                                }if(carcass!=null){
+                                    eat(carcass);
+                                } else if (prey != null) {
                                     killPrey();
                                 }
                             }
@@ -73,7 +79,6 @@ public class Wolf extends Animal implements Actor {
                                 isLeader = true;
                             }
                         }
-
                     }
                 } else {
                     if (world.isOnTile(this)) {
@@ -111,7 +116,7 @@ public class Wolf extends Animal implements Actor {
                 if (anyBlockingLocation != null) {
                     if (surroundingTile.hashCode() == anyBlockingLocation.hashCode()) {
                         die(prey);
-                        changeHungerForPack(10);
+                        //changeHungerForPack(10);
                         prey = null;
                         return;
                     }

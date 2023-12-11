@@ -11,7 +11,7 @@ import java.util.Random;
 import java.util.ArrayList;
 
 import packages.animals.*;
-
+import packages.terrain.Carcass;
 
 
 public class Spawner{
@@ -56,7 +56,7 @@ public class Spawner{
                 } else {
                     amountToSpawn = Integer.parseInt(fileValues.get(i).split(" ")[1]);
                 }
-            } else {
+            }else {
                 if (fileValues.get(i).contains("-")) {
                     lowerBound = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[0]);
                     upperBound = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[1]);
@@ -73,7 +73,6 @@ public class Spawner{
                     hasCoords = true;
                 }
             }
-
             for (int k = 0; k < amountToSpawn; k++) {
                 int x = rand.nextInt(size);
                 int y = rand.nextInt(size);
@@ -87,7 +86,9 @@ public class Spawner{
                         } else {
                             spawnBear(l, x, y, new Location(x, y));
                         }
-                    } else {
+                    }else if(objToSpawn.equals("Carcass")) {
+                        spawnCarcass();
+                    }else {
                         spawnObject(objToSpawn, world,p,size, animals.contains(objToSpawn));
                     }
 
@@ -116,8 +117,20 @@ public class Spawner{
             y = rand.nextInt(size);
             l = new Location(x, y);
         }
-
         world.setTile(l, new Bear(world, p, world.getSurroundingTiles(l, (world.getSize() / 3))));
+    }
+
+    private static void spawnCarcass(){
+        int x = rand.nextInt(size);
+        int y = rand.nextInt(size);
+        Location l = new Location(x, y);
+        while (!world.isTileEmpty(l)) {
+            x = rand.nextInt(size);
+            y = rand.nextInt(size);
+            l = new Location(x, y);
+
+        }
+        world.setTile(l, new Carcass(world,p,"carcass"));
     }
 
     private static void spawnObject(String className, World world, Program p, int size, boolean isBlocking) {
@@ -158,7 +171,7 @@ public class Spawner{
         public static void checkSpace(boolean blocking) {
             if (blocking) {
                 for(Location tile : world.getSurroundingTiles(new Location(0,0),size)) {
-                    if (!world.isTileEmpty(tile)){;
+                    if (world.isTileEmpty(tile)){;
                         return;
                     }
                 }
