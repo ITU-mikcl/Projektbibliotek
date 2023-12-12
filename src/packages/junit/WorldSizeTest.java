@@ -1,13 +1,11 @@
 package packages.junit;
 import itumulator.executable.Program;
-import itumulator.world.World;
-import packages.Spawner;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
-class JunitTest {
+class WorldSizeTest {
 
     @org.junit.jupiter.api.BeforeEach
     void setUp() {
