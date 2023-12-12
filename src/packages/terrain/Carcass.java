@@ -28,7 +28,7 @@ public class Carcass extends SpawnableObjects implements Actor, DynamicDisplayIn
         if (stepsSinceSpawned % 60 == 0) {
             Location myLocation = world.getLocation(this);
             world.delete(this);
-            Fungi currentFungi =  new Fungi(world, p, fungiImages[state], myLocation);
+            Fungi currentFungi =  new Fungi(world, p, fungiImages[state], myLocation, state);
             world.setTile(myLocation, currentFungi);
             world.remove(currentFungi);
         }

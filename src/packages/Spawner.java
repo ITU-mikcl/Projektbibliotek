@@ -146,7 +146,7 @@ public class Spawner{
             l = new Location(x, y);
 
         }
-        Fungi currentFungi =  new Fungi(world,p,"fungi", l);
+        Fungi currentFungi =  new Fungi(world,p,"fungi", l, 1);
         world.setTile(l, currentFungi);
         world.remove(currentFungi);
     }
