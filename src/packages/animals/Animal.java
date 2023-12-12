@@ -53,7 +53,6 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
     }
 
     public void eat(Object food) {
-
         if(food instanceof Grass){
             hunger += 5;
         } else if (food instanceof Carcass) {

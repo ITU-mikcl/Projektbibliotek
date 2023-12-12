@@ -12,11 +12,12 @@ import java.util.ArrayList;
 
 import packages.animals.*;
 import packages.terrain.Carcass;
+import packages.terrain.Fungi;
 
 
 public class Spawner{
     public static ArrayList<WolfPack> wolfPacks = new ArrayList<>();
-    public static HashSet<String> animals = new HashSet<>(Arrays.asList("rabbit","wolf","bear"));
+    public static HashSet<String> blockingObjects = new HashSet<>(Arrays.asList("rabbit","wolf","bear", "fungi"));
     public static Random rand = new Random();
     public static Wolf wolfCurrent;
     public static World world;
@@ -40,7 +41,7 @@ public class Spawner{
 
         for (int i = 1 ; i < fileValues.size(); i++){
             objToSpawn = fileValues.get(i).split(" ")[0];
-            if (animals.contains(objToSpawn)) {
+            if (blockingObjects.contains(objToSpawn)) {
                 checkSpace(true);
             } else {
                 checkSpace(false);
@@ -56,7 +57,7 @@ public class Spawner{
                 } else {
                     amountToSpawn = Integer.parseInt(fileValues.get(i).split(" ")[1]);
                 }
-            }else {
+            } else {
                 if (fileValues.get(i).contains("-")) {
                     lowerBound = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[0]);
                     upperBound = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[1]);
@@ -88,8 +89,10 @@ public class Spawner{
                         }
                     }else if(objToSpawn.equals("Carcass")) {
                         spawnCarcass();
-                    }else {
-                        spawnObject(objToSpawn, world,p,size, animals.contains(objToSpawn));
+                    } else if (objToSpawn.equals("fungi")) {
+                        spawnFungi();
+                    } else {
+                        spawnObject(objToSpawn, world,p,size, blockingObjects.contains(objToSpawn));
                     }
 
             }
@@ -133,8 +136,23 @@ public class Spawner{
         world.setTile(l, new Carcass(world,p,"carcass"));
     }
 
+    private static void spawnFungi(){
+        int x = rand.nextInt(size);
+        int y = rand.nextInt(size);
+        Location l = new Location(x, y);
+        while (!world.isTileEmpty(l)) {
+            x = rand.nextInt(size);
+            y = rand.nextInt(size);
+            l = new Location(x, y);
+
+        }
+        Fungi currentFungi =  new Fungi(world,p,"fungi", l);
+        world.setTile(l, currentFungi);
+        world.remove(currentFungi);
+    }
+
     private static void spawnObject(String className, World world, Program p, int size, boolean isBlocking) {
-        if(animals.contains(className)){
+        if(blockingObjects.contains(className)){
             className = "packages.animals." + Character.toUpperCase(className.charAt(0)) + className.substring(1);
         }else{
             className = "packages.terrain." + Character.toUpperCase(className.charAt(0)) + className.substring(1);

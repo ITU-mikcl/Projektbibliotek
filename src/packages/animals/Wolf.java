@@ -69,7 +69,7 @@ public class Wolf extends Animal implements Actor {
                                     }
                                 }
                                 if (carcass != null) {
-                                    eat(carcass);
+                                    eatCarcass();
                                 } else if (prey != null) {
                                     killPrey();
                                 }
@@ -118,8 +118,27 @@ public class Wolf extends Animal implements Actor {
                 if (anyBlockingLocation != null) {
                     if (surroundingTile.hashCode() == anyBlockingLocation.hashCode()) {
                         die(prey);
-                        //changeHungerForPack(10);
                         prey = null;
+                        return;
+                    }
+                }
+            }
+            moveToLocation(myLocation, lookForBlocking(myLocation, prey.getClass()));
+        } catch (NullPointerException ignore) {
+        }
+    }
+
+    private void eatCarcass() {
+        try {
+            Location anyBlockingLocation = lookForAnyBlocking(myLocation, carcass.getClass(), 1);
+            Set<Location> surroundingTiles = world.getSurroundingTiles(myLocation);
+
+            for (Location surroundingTile : surroundingTiles) {
+                if (anyBlockingLocation != null) {
+                    if (surroundingTile.hashCode() == anyBlockingLocation.hashCode()) {
+                        eat(carcass);
+                        changeHungerForPack(10);
+                        carcass = null;
                         return;
                     }
                 }

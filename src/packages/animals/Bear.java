@@ -18,6 +18,7 @@ public class Bear extends Animal implements Actor {
     final String[] images = {"bear-small", "bear-small-sleeping", "bear", "bear-sleeping"};
     Location myLocation;
     Set<Location> myTerritory;
+    Carcass carcass;
     public Bear(World world, Program p, Set<Location> myTerritory){
         super(world, p, "bear-small", 2, 10);
         this.myTerritory = myTerritory;
@@ -33,8 +34,10 @@ public class Bear extends Animal implements Actor {
                     } else {
                         myLocation = world.getLocation(this);
 
-                        if (prey != null) {
-                            if (world.contains(prey)) {
+                        if (carcass != null) {
+                            eatCarcass();
+                        } else if (prey != null) {
+                            if (world.contains(prey) && world.isOnTile(prey)) {
                                 if (myTerritory.contains(world.getLocation(prey))) {
                                     killPrey();
                                 } else {
@@ -42,10 +45,14 @@ public class Bear extends Animal implements Actor {
                                 }
                             }
                         } else {
-                            if (lookForClosestFood(myLocation) instanceof Rabbit || lookForClosestFood(myLocation) instanceof Carcass) {
-                                prey = bearLookForPrey();
-                            } else if (!eatBerries()) {
-                                bearLookingForGrass();
+                            carcass = lookForCarcass();
+                            if (carcass == null) {
+                                Object closestFood = lookForClosestFood(myLocation);
+                                if (closestFood instanceof Rabbit) {
+                                    prey = bearLookForPrey();
+                                } else if (!eatBerries()) {
+                                    bearLookingForGrass();
+                                }
                             }
                         }
                     }
@@ -68,6 +75,25 @@ public class Bear extends Animal implements Actor {
         }
 
         return false;
+    }
+
+    private void eatCarcass() {
+        try {
+            Location anyBlockingLocation = lookForAnyBlocking(myLocation, carcass.getClass(), 1);
+            Set<Location> surroundingTiles = world.getSurroundingTiles(myLocation);
+
+            for (Location surroundingTile : surroundingTiles) {
+                if (anyBlockingLocation != null) {
+                    if (surroundingTile.hashCode() == anyBlockingLocation.hashCode()) {
+                        eat(carcass);
+                        carcass = null;
+                        return;
+                    }
+                }
+            }
+            moveToLocation(myLocation, lookForBlocking(myLocation, prey.getClass()));
+        } catch (NullPointerException ignore) {
+        }
     }
 
     private Location bearLookForBlocking(Class<?> targetClass){
@@ -129,7 +155,6 @@ public class Bear extends Animal implements Actor {
                 if (anyBlockingLocation != null) {
                     if (surroundingTile.hashCode() == anyBlockingLocation.hashCode()) {
                         die(prey);
-                        hunger += 5;
                         prey = null;
                         return;
                     }
@@ -137,6 +162,16 @@ public class Bear extends Animal implements Actor {
             }
             moveToLocation(myLocation,lookForBlocking(myLocation, prey.getClass()));
         }catch (NullPointerException ignore){}
+    }
+
+    private Carcass lookForCarcass() {
+        for (Location tile : myTerritory) {
+            if (world.getTile(tile) instanceof Carcass) {
+                return (Carcass) world.getTile(tile);
+            }
+        }
+
+        return null;
     }
 
     public DisplayInformation getInformation() {
