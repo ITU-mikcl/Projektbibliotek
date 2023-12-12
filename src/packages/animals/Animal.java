@@ -20,12 +20,23 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
     protected Location burrowLocation = null;
     protected Location myLocation;
     protected int hunger;
+    /**
+     * This is Aniamals' constructor,
+     * parameters World, Program and image are inhereted
+     * from super class 'SpawnableObjects'
+     * speed and hunger are initialized in animal.
+     */
     public Animal (World world, Program p, String image, int speed, int hunger){
         super(world,p,image);
         this.speed = speed;
         this.hunger = hunger;
     }
 
+    /**
+     * Method makes animal look for grass
+     * tries to check if nonBlocking object is
+     * @param myLocation
+     */
     protected void lookForGrass(Location myLocation) {
         try {
             Object standingOn = world.getNonBlocking(world.getLocation(this));
