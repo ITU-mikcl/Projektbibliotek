@@ -10,7 +10,7 @@ import packages.terrain.Carcass;
 
 import java.awt.*;
 
-public class Rabbit extends Animal implements Actor {
+public class Rabbit extends FossorialAnimals implements Actor {
     boolean isBeingChased = false;
     final String[] images = {"rabbit-small", "rabbit-small-sleeping", "rabbit-large", "rabbit-sleeping"};
     public Rabbit(World world, Program p) {
@@ -61,11 +61,7 @@ public class Rabbit extends Animal implements Actor {
 
     private void nightAct() {
         if (world.isOnTile(this)) {
-            if (!isOnBurrow(burrowLocation)){
-                lookForHole();
-            } else {
-                world.remove(this);
-            }
+            getToBurrow();
         }
     }
 
@@ -73,7 +69,7 @@ public class Rabbit extends Animal implements Actor {
     protected void die() {
         isDead = true;
         world.delete(this);
-        Carcass carcass = new Carcass(world,p,"carcass-small");
+        Carcass carcass = new Carcass(world,p,"carcass-small", "fungi-small");
         world.setTile(myLocation,carcass);
     }
 
@@ -111,7 +107,8 @@ public class Rabbit extends Animal implements Actor {
         }
     }
 
-    private void lookForHole() {
+    @Override
+    public void lookForBurrow() {
         if (burrowLocation == null) {
             burrowLocation = lookForAnyBlocking(Burrow.class, 3);
 

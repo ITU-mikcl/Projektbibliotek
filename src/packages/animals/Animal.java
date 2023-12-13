@@ -52,7 +52,7 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
     protected void die() {
         isDead = true;
         world.delete(this);
-        Carcass carcass = new Carcass(world,p,"carcass");
+        Carcass carcass = new Carcass(world,p,"carcass", "fungi");
         world.setTile(myLocation,carcass);
     }
 
@@ -174,9 +174,9 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
             hunger += 5;
         } else if (food instanceof Carcass) {
             if(((Carcass) food).isBig()){
-                hunger += 7;
+                hunger += 10;
             }else{
-                hunger += 4;
+                hunger += 5;
             }
         }
         world.delete(food);
@@ -209,16 +209,9 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
         return null;
     }
 
-    protected Rabbit lookForPrey(){
+    protected Object lookForMeat(Class<?> targetClass) {
         try {
-            return (Rabbit) world.getTile(lookForBlocking(Rabbit.class));
-        } catch (NullPointerException e) {
-            return null;
-        }
-    }
-    protected Carcass wolfLookForCarcass(){
-        try {
-            return (Carcass) world.getTile(lookForBlocking(Carcass.class));
+            return world.getTile(lookForBlocking(targetClass));
         } catch (NullPointerException e) {
             return null;
         }

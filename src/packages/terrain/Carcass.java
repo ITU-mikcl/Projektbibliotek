@@ -12,15 +12,14 @@ import java.awt.*;
 
 
 public class Carcass extends SpawnableObjects implements Actor, DynamicDisplayInformationProvider {
-    final String[] images = {"carcass-small", "carcass"};
-    final String[] fungiImages = {"fungi-small", "fungi"};
     int stepsSinceSpawned;
-    String image;
-    int state = 1;
+    String carcassImage;
+    String fungiImage;
 
-    public Carcass(World world, Program p, String image){
-        super(world,p,image);
-        this.image = image;
+    public Carcass(World world, Program p, String carcassImage, String fungiImage){
+        super(world,p,carcassImage);
+        this.carcassImage = carcassImage;
+        this.fungiImage = fungiImage;
     }
     public void act(World world) {
         stepsSinceSpawned++;
@@ -28,16 +27,16 @@ public class Carcass extends SpawnableObjects implements Actor, DynamicDisplayIn
         if (stepsSinceSpawned % 60 == 0) {
             Location myLocation = world.getLocation(this);
             world.delete(this);
-            Fungi currentFungi =  new Fungi(world, p, fungiImages[state], myLocation, state);
+            Fungi currentFungi =  new Fungi(world, p, fungiImage, myLocation);
             world.setTile(myLocation, currentFungi);
             world.remove(currentFungi);
         }
     }
     public boolean isBig(){
-        return image.equals("carcass");
+        return carcassImage.equals("carcass");
     }
 
     public DisplayInformation getInformation() {
-        return new DisplayInformation(Color.white, images[state]);
+        return new DisplayInformation(Color.white, carcassImage);
     }
 }

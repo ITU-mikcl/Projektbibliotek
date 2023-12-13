@@ -12,19 +12,18 @@ public class Fungi extends SpawnableObjects implements Actor {
     private int stepsSinceSpawned = 0;
     final Location myLocation;
     private int hunger;
-    private int state;
     private boolean hasSpread = false;
-    private String image;
+    private final String image;
 
-    public Fungi(World world, Program p, String image, Location myLocation, int state) {
+    public Fungi(World world, Program p, String image, Location myLocation) {
         super(world, p, image);
         this.myLocation = myLocation;
         this.image = image;
-        this.state = state;
-        if (state > 0) {
-            this.hunger = 10;
+
+        if (image.equals("fungi")) {
+            this.hunger = 20;
         } else {
-            this.hunger = 5;
+            this.hunger = 10;
         }
     }
 
@@ -43,7 +42,7 @@ public class Fungi extends SpawnableObjects implements Actor {
         if (foodAvailable() && !hasSpread) {
             for (Location tile : world.getSurroundingTiles(lookForCarcass())) {
                 if (world.isTileEmpty(tile)) {
-                    Fungi tempFungi = new Fungi(world, p, image, tile, state);
+                    Fungi tempFungi = new Fungi(world, p, image, tile);
                     world.setTile(tile, tempFungi);
                     world.remove(tempFungi);
                     hasSpread = true;
