@@ -169,17 +169,13 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
         moveToLocation(lookForNonBlocking(Grass.class, sizeOfWorld));
     }
 
-    public void eat(Object food) {
-        if(food instanceof Grass){
-            hunger += 5;
-        } else if (food instanceof Carcass) {
-            if(((Carcass) food).isBig()){
-                hunger += 10;
-            }else{
-                hunger += 5;
-            }
-        }
+    public int eat(Object food) {
         world.delete(food);
+        if (food instanceof Carcass && ((Carcass) food).isBig()) {
+            return 10;
+        } else {
+            return 5;
+        }
     }
 
     protected Location lookForNonBlocking(Class<?> targetClass, int radius) {
@@ -193,6 +189,16 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
             }
         }
         return null;
+    }
+    protected Animal killPrey(Animal prey) {
+        Location preyLocation = world.getLocation(prey);
+        if (world.getSurroundingTiles().contains(preyLocation)) {
+            prey.die();
+            return null;
+        } else {
+            moveToLocation(world.getEmptySurroundingTiles(preyLocation).iterator().next());
+            return prey;
+        }
     }
 
     protected boolean isOnBurrow(Location burrowLocation) {

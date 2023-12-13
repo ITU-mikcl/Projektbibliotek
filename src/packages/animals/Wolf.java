@@ -93,8 +93,8 @@ public class Wolf extends FossorialAnimals implements Actor {
 
             if (carcass != null) {
                 eatCarcass();
-            } else if (prey != null &&  world.isOnTile(prey)) {
-                killPrey();
+            } else if (prey != null && world.isOnTile(prey)) {
+                prey = killPrey(prey);
             }
         }
     }
@@ -137,31 +137,19 @@ public class Wolf extends FossorialAnimals implements Actor {
         }
     }
 
-    private void killPrey() {
-        Location preyLocation = world.getLocation(prey);
-        if (world.getSurroundingTiles().contains(preyLocation)) {
-            prey.die();
-            prey = null;
-        } else {
-            moveToLocation(world.getEmptySurroundingTiles(preyLocation).iterator().next());
-        }
-    }
-
     private void eatCarcass() {
         Location carcassLocation = world.getLocation(carcass);
         if (world.getSurroundingTiles().contains(carcassLocation)) {
-            eat(carcass);
-            changeHungerForPack(10);
+            changeHungerForPack(eat(carcass));
+            carcass = null;
         } else {
             moveToLocation(world.getEmptySurroundingTiles(carcassLocation).iterator().next());
         }
     }
 
     private void changeHungerForPack(int hungerAmount) {
-        for (Map.Entry<Wolf, Boolean> entry : allWolvesInMyPack.entrySet()) {
-            if (!entry.getValue()) {
-                changeHunger(hungerAmount);
-            }
+        for (Wolf wolf : allWolvesInMyPack.keySet()) {
+            wolf.changeHunger(hungerAmount);
         }
     }
 

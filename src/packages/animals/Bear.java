@@ -26,90 +26,41 @@ public class Bear extends Animal implements Actor {
     public void act(World world){
         hunger = getHunger(hunger);
 
-        if (canIAct()) {
-            if (world.isDay()) {
-                if (!world.isOnTile(this)) {
-
-                } else {
-                    if (carcass != null) {
-                        eatCarcass();
-                    } else if (prey != null) {
-                        if (world.contains(prey) && world.isOnTile(prey)) {
-                            if (myTerritory.contains(world.getLocation(prey))) {
-                                killPrey();
-                            } else {
-                                prey = null;
-                            }
-                        }
-                    } else {
-                        carcass = lookForCarcass();
-                        if (carcass == null) {
-                            Object closestFood = lookForClosestFood(myLocation);
-                            if (closestFood instanceof Rabbit) {
-                                prey = bearLookForPrey();
-                            } else if (!eatBerries()) {
-                                bearLookingForGrass();
-                            }
-                        }
-                    }
-                }
+        if (canIAct() && world.isDay()) {
+            carcass = (Carcass) lookForMeat(Carcass.class);
+            prey = (Rabbit) lookForMeat(Rabbit.class);
+            if (myTerritory.contains(carcass)) {
+                eatCarcass();
+            } else if (myTerritory.contains(prey)) {
+                prey = (Rabbit) killPrey(prey);
+            } else if (!eatBerries()) {
+                bearLookingForGrass();
             }
         }
     }
 
     private boolean eatBerries() {
-        Location targetBushLocation = bearLookForBlocking(Berry.class);
+        Location targetBushLocation = lookForBlocking(Berry.class);
 
-        if (targetBushLocation != null) {
+        if (myTerritory.contains(targetBushLocation)) {
             if (world.getSurroundingTiles().contains(targetBushLocation)) {
                 Berry targetBush = (Berry) world.getTile(targetBushLocation);
                 hunger += targetBush.eatBerries();
             } else {
-                moveToLocation(lookForNonBlockingInMyTerritory(myLocation, Berry.class, sizeOfWorld));
+                moveToLocation(lookForNonBlockingInMyTerritory(Berry.class));
             }
             return true;
         }
-
         return false;
     }
 
     private void eatCarcass() {
-        try {
-            Location anyBlockingLocation = lookForAnyBlocking(carcass.getClass(), 1);
-            Set<Location> surroundingTiles = world.getSurroundingTiles(myLocation);
-
-            for (Location surroundingTile : surroundingTiles) {
-                if (anyBlockingLocation != null) {
-                    if (surroundingTile.hashCode() == anyBlockingLocation.hashCode()) {
-                        eat(carcass);
-                        carcass = null;
-                        return;
-                    }
-                }
-            }
-            moveToLocation(lookForBlocking(prey.getClass()));
-        } catch (NullPointerException ignore) {
-        }
-    }
-
-    private Location bearLookForBlocking(Class<?> targetClass){
-        for (int i = 1; i < sizeOfWorld; i++) {
-            for (Location targetLocation: world.getSurroundingTiles(myLocation, i)) {
-                if (targetClass.isInstance(world.getTile(targetLocation))
-                        && !world.getEmptySurroundingTiles(targetLocation).isEmpty()
-                        && myTerritory.contains(targetLocation)) {
-                    return targetLocation;
-                }
-            }
-        }
-        return null;
-    }
-
-    private Rabbit bearLookForPrey(){
-        try {
-            return (Rabbit) world.getTile(bearLookForBlocking(Rabbit.class));
-        } catch (NullPointerException e) {
-            return null;
+        Location carcassLocation = world.getLocation(carcass);
+        if (world.getSurroundingTiles().contains(carcassLocation)) {
+            hunger += (eat(carcass));
+            carcass = null;
+        } else {
+            moveToLocation(world.getEmptySurroundingTiles(carcassLocation).iterator().next());
         }
     }
 
@@ -121,15 +72,15 @@ public class Bear extends Animal implements Actor {
                 Grass standingOnGrass = (Grass) standingOn;
                 eat(standingOnGrass);
             } else {
-                moveToLocation(lookForNonBlockingInMyTerritory(myLocation, Grass.class, sizeOfWorld));
+                moveToLocation(lookForNonBlockingInMyTerritory(Grass.class));
             }
         } catch (IllegalArgumentException e) {
-            moveToLocation(lookForNonBlockingInMyTerritory(myLocation, Grass.class, sizeOfWorld));
+            moveToLocation(lookForNonBlockingInMyTerritory(Grass.class));
         }
     }
 
-    protected Location lookForNonBlockingInMyTerritory(Location myLocation, Class<?> targetClass, int radius) {
-        for (int i = 1; i < radius; i++) {
+    protected Location lookForNonBlockingInMyTerritory(Class<?> targetClass) {
+        for (int i = 1; i < sizeOfWorld; i++) {
             for (Location targetLocation : world.getSurroundingTiles(myLocation, i)) {
                 if (world.containsNonBlocking(targetLocation)
                         && targetClass.isInstance(world.getNonBlocking(targetLocation))
@@ -141,35 +92,6 @@ public class Bear extends Animal implements Actor {
         }
         return null;
     }
-
-    private void killPrey() {
-        try{
-            Location anyBlockingLocation = lookForAnyBlocking(prey.getClass(), 1);
-            Set<Location> surroundingTiles = world.getSurroundingTiles(myLocation);
-
-            for(Location surroundingTile : surroundingTiles) {
-                if (anyBlockingLocation != null) {
-                    if (surroundingTile.hashCode() == anyBlockingLocation.hashCode()) {
-                        prey.die();
-                        prey = null;
-                        return;
-                    }
-                }
-            }
-            moveToLocation(lookForBlocking(prey.getClass()));
-        }catch (NullPointerException ignore){}
-    }
-
-    private Carcass lookForCarcass() {
-        for (Location tile : myTerritory) {
-            if (world.getTile(tile) instanceof Carcass) {
-                return (Carcass) world.getTile(tile);
-            }
-        }
-
-        return null;
-    }
-
     public DisplayInformation getInformation() {
         return new DisplayInformation(Color.white, images[getState(isOnBurrow(burrowLocation))]);
     }
