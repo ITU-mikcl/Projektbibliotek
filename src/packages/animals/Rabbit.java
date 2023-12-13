@@ -5,11 +5,10 @@ import itumulator.executable.Program;
 import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.World;
-import packages.terrain.Grass;
 import packages.terrain.Burrow;
+import packages.terrain.Carcass;
 
 import java.awt.*;
-import java.util.Set;
 
 public class Rabbit extends Animal implements Actor {
     boolean isBeingChased = false;
@@ -20,49 +19,80 @@ public class Rabbit extends Animal implements Actor {
 
     @Override
     public void act(World world) {
+        hunger = getHunger(hunger);
 
-        hunger = statusCheck(this, hunger);
-
-        if (!isDead()) {
-            if (canIAct()) {
-                if (world.isDay()) {
-                    if (!world.isOnTile(this)) {
-                        world.setTile(getEmptyTile(burrowLocation), this);
-                    } else {
-                        myLocation = world.getLocation(this);
-                        Object predator;
-                        for(Location location : world.getSurroundingTiles(2)){
-                            predator = world.getTile(location);
-                            if(predator instanceof Wolf || predator instanceof Bear){
-                                moveTo(this, nextOppositeTile(myLocation, location, world.getSurroundingTiles()));
-                                isBeingChased = true;
-                                break;
-                            }
-                            isBeingChased = false;
-                        }
-                        if (!isBeingChased){
-                            if (isAdult() && hunger >= 5) {
-                                Location partnerLocation = lookForBlocking(myLocation, Rabbit.class);
-                                if (partnerLocation != null){
-                                    lookForPartner(partnerLocation);
-                                }else{lookForGrass(myLocation);}
-                            }else{lookForGrass(myLocation);}
-                        }
-                    }
-                } else {
-                    if (world.isOnTile(this)) {
-                        myLocation = world.getLocation(this);
-
-                        if (!isOnBurrow(burrowLocation, myLocation)){
-                            lookForHole();
-                        } else {
-                            world.remove(this);
-                        }
-                    }
-                }
+        if (canIAct()) {
+            if (world.isDay()) {
+                dayAct();
+            } else {
+                nightAct();
             }
         }
     }
+
+    private void dayAct() {
+        if (burrowLocation != null) {
+            wakeUp();
+        }
+
+        Object predator;
+        for(Location location : world.getSurroundingTiles(2)){
+            predator = world.getTile(location);
+            if(predator instanceof Wolf || predator instanceof Bear){
+                moveTo(nextOppositeTile(location));
+                isBeingChased = true;
+                break;
+            }
+            isBeingChased = false;
+        }
+
+        if (!isBeingChased){
+            if (isAdult && hunger >= 5) {
+                Location partnerLocation = lookForBlocking(Rabbit.class);
+                if (partnerLocation != null){
+                    lookForPartner(partnerLocation);
+                    return;
+                }
+            }
+
+            lookForGrass();
+        }
+    }
+
+    private void nightAct() {
+        if (world.isOnTile(this)) {
+            if (!isOnBurrow(burrowLocation)){
+                lookForHole();
+            } else {
+                world.remove(this);
+            }
+        }
+    }
+
+    @Override
+    protected void die() {
+        isDead = true;
+        world.delete(this);
+        Carcass carcass = new Carcass(world,p,"carcass-small");
+        world.setTile(myLocation,carcass);
+    }
+
+    private Location nextOppositeTile(Location targetLocation) {
+        double maxDistance = Double.MIN_VALUE;
+        Location tileToMoveTo = myLocation;
+        double surroundingDistance;
+
+        for (Location tile : world.getEmptySurroundingTiles()){
+            surroundingDistance = calculateDistance(tile, targetLocation);
+
+            if (surroundingDistance > maxDistance) {
+                maxDistance = surroundingDistance;
+                tileToMoveTo = tile;
+            }
+        }
+        return tileToMoveTo;
+    }
+
     private void lookForPartner(Location partnerLocation) {
         for(Location surroundingTile : world.getSurroundingTiles()){
             if(surroundingTile.hashCode() == partnerLocation.hashCode()){
@@ -70,7 +100,7 @@ public class Rabbit extends Animal implements Actor {
                 return;
             }
         }
-        moveToLocation(myLocation, partnerLocation);
+        moveToLocation(partnerLocation);
     }
 
     private void reproduce() {
@@ -81,27 +111,24 @@ public class Rabbit extends Animal implements Actor {
         }
     }
 
-
-
     private void lookForHole() {
         if (burrowLocation == null) {
-            burrowLocation = lookForAnyBlocking(myLocation, Burrow.class, 3);
+            burrowLocation = lookForAnyBlocking(Burrow.class, 3);
 
             if (burrowLocation == null) {
                 if (world.containsNonBlocking(myLocation)) {
-                    lookForGrass(myLocation);
+                    lookForGrass();
                 } else {
                     world.setTile(myLocation, new Burrow(world, p, "hole-small"));
                     burrowLocation = myLocation;
                 }
             }
         } else {
-            moveToLocation(myLocation, burrowLocation);
-            myLocation = world.getLocation(this);
+            moveToLocation(burrowLocation);
         }
     }
 
     public DisplayInformation getInformation() {
-        return new DisplayInformation(Color.white, images[getState(isOnBurrow(burrowLocation, myLocation))]);
+        return new DisplayInformation(Color.white, images[getState(isOnBurrow(burrowLocation))]);
     }
 }

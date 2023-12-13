@@ -37,10 +37,6 @@ public class Carcass extends SpawnableObjects implements Actor, DynamicDisplayIn
         return image.equals("carcass");
     }
 
-    public void changeState(int i){
-        state = i;
-    }
-
     public DisplayInformation getInformation() {
         return new DisplayInformation(Color.white, images[state]);
     }
