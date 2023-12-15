@@ -20,14 +20,9 @@ public class Grass extends SpawnableObjects implements NonBlocking, Actor {
             spread();
         }
     }
-    public void decompose(){
-        world.delete(this);
-    }
 
     public void spread(){
-        Set<Location> surroundingTiles = world.getSurroundingTiles();
-        List<Location> list = new ArrayList<>(surroundingTiles);
-        for (Location location : list) {
+        for (Location location : world.getSurroundingTiles()) {
             if (!world.containsNonBlocking(location)) {
                 world.setTile(location, new Grass(world, p));
                 break;

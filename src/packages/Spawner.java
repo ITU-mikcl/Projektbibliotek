@@ -5,10 +5,7 @@ import itumulator.world.Location;
 import itumulator.world.World;
 
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.ArrayList;
+import java.util.*;
 
 import packages.animals.*;
 import packages.terrain.Carcass;
@@ -80,14 +77,14 @@ public class Spawner{
                 Location l = new Location(x, y);
 
                     if(objToSpawn.equals("wolf")){
-                        spawnWolf(l, x, y, size, (k < 1));
+                        spawnWolf(l, x, y, size, (k < 1), wolfPacks.get(wolfPacks.size() - 1));
                     } else if (objToSpawn.equals("bear")) {
                         if (hasCoords) {
                             spawnBear(l, x, y, new Location(xCoords, yCoords));
                         } else {
                             spawnBear(l, x, y, new Location(x, y));
                         }
-                    }else if(objToSpawn.equals("Carcass")) {
+                    }else if(objToSpawn.equals("carcass")) {
                         spawnCarcass();
                     } else if (objToSpawn.equals("fungi")) {
                         spawnFungi();
@@ -99,16 +96,19 @@ public class Spawner{
         }
     }
 
-    public static void spawnWolf(Location l, int x, int y, int size, boolean spawnALeader) {
-        while (!world.isTileEmpty(l)) {
-            x = rand.nextInt(size);
-            y = rand.nextInt(size);
-            l = new Location(x, y);
+    public static void spawnWolf(Location l, int x, int y, int size, boolean spawnALeader, WolfPack myWolfPack) {
+        for (int i = 1; i < size; i++) {
+            for (Location targetLocation : world.getSurroundingTiles(l, i)) {
+                if (world.isTileEmpty(targetLocation)) {
+                    l = targetLocation;
+                }
+            }
         }
+
         if(spawnALeader){
-            wolfCurrent = new Wolf(world, p, true, wolfPacks.size() - 1);
+            wolfCurrent = new Wolf(world, p, true, myWolfPack);
         }else{
-            wolfCurrent = new Wolf(world, p, false, wolfPacks.size() - 1);
+            wolfCurrent = new Wolf(world, p, false, myWolfPack);
         }
         wolfPacks.get(wolfPacks.size() - 1).addWolf(wolfCurrent);
         world.setTile(l, wolfCurrent);

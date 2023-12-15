@@ -66,7 +66,7 @@ public class Rabbit extends FossorialAnimals implements Actor {
     }
 
     @Override
-    protected void die() {
+    public void die() {
         isDead = true;
         world.delete(this);
         Carcass carcass = new Carcass(world,p,"carcass-small", "fungi-small");

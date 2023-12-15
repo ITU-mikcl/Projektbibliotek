@@ -19,6 +19,7 @@ public class Bear extends Animal implements Actor {
     Location myLocation;
     Set<Location> myTerritory;
     Carcass carcass;
+    Location preyLocation, carcassLocation;
     public Bear(World world, Program p, Set<Location> myTerritory){
         super(world, p, "bear-small", 2, 10);
         this.myTerritory = myTerritory;
@@ -27,18 +28,29 @@ public class Bear extends Animal implements Actor {
         hunger = getHunger(hunger);
 
         if (canIAct() && world.isDay()) {
+            myLocation = world.getLocation(this);
+
+            if (!isAdult && stepsSinceSpawned > 60) {
+                isAdult = true;
+                speed /= 2;
+            }
+
             carcass = (Carcass) lookForMeat(Carcass.class);
             prey = (Rabbit) lookForMeat(Rabbit.class);
-            if (myTerritory.contains(carcass)) {
+
+            try {
+                preyLocation = world.getLocation(prey);
+                carcassLocation = world.getLocation(carcass);
+            } catch (IllegalArgumentException e) {
+
+            }
+
+            if (myTerritory.contains(carcassLocation) && carcass != null) {
                 eatCarcass();
-            } else if (myTerritory.contains(prey)) {
+            } else if (myTerritory.contains(preyLocation) && prey != null) {
                 prey = (Rabbit) killPrey(prey);
             } else if (!eatBerries()) {
-                if (myLocation != null) {
-                    bearLookingForGrass();
-                } else {
-                    myLocation = world.getLocation(this);
-                }
+                bearLookingForGrass();
             }
         }
     }
@@ -46,20 +58,22 @@ public class Bear extends Animal implements Actor {
     private boolean eatBerries() {
         Location targetBushLocation = lookForBlocking(Berry.class);
 
-        if (myTerritory.contains(targetBushLocation)) {
-            if (world.getSurroundingTiles().contains(targetBushLocation)) {
-                Berry targetBush = (Berry) world.getTile(targetBushLocation);
-                hunger += targetBush.eatBerries();
-            } else {
-                moveToLocation(lookForNonBlockingInMyTerritory(Berry.class));
+        if (targetBushLocation != null) {
+            Berry targetBush = (Berry) world.getTile(targetBushLocation);
+
+            if (myTerritory.contains(targetBushLocation) && targetBush.hasBerries) {
+                if (world.getSurroundingTiles().contains(targetBushLocation)) {
+                    hunger += targetBush.eatBerries();
+                } else {
+                    moveToLocation(targetBushLocation);
+                }
+                return true;
             }
-            return true;
         }
         return false;
     }
 
     private void eatCarcass() {
-        Location carcassLocation = world.getLocation(carcass);
         if (world.getSurroundingTiles().contains(carcassLocation)) {
             hunger += (eat(carcass));
             carcass = null;
@@ -74,7 +88,7 @@ public class Bear extends Animal implements Actor {
 
             if (standingOn instanceof Grass) {
                 Grass standingOnGrass = (Grass) standingOn;
-                eat(standingOnGrass);
+                hunger += eat(standingOnGrass);
             } else {
                 moveToLocation(lookForNonBlockingInMyTerritory(Grass.class));
             }
@@ -96,7 +110,22 @@ public class Bear extends Animal implements Actor {
         }
         return null;
     }
+
+    protected int getState() {
+        if(isAdult) {
+            if (world.isNight()) {
+                return 3;
+            } else {
+                return 2;
+            }
+        } else if (world.isNight()) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
     public DisplayInformation getInformation() {
-        return new DisplayInformation(Color.white, images[getState(isOnBurrow(burrowLocation))]);
+        return new DisplayInformation(Color.white, images[getState()]);
     }
 }

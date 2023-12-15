@@ -1,6 +1,7 @@
-12
+20
 rabbit 2-4
 wolf 2
 bear 2
-grass 5
+grass 20
 capybara 3
+berry 4

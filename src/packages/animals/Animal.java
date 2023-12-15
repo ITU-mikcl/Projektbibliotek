@@ -4,21 +4,18 @@ import itumulator.executable.DynamicDisplayInformationProvider;
 import itumulator.executable.Program;
 import itumulator.world.Location;
 import itumulator.world.World;
-import packages.SpawnableObjects;
+import packages.Organism;
 import packages.terrain.Carcass;
 import packages.terrain.Grass;
 
 import java.util.Set;
 
-public abstract class Animal extends SpawnableObjects implements DynamicDisplayInformationProvider {
+public abstract class Animal extends Organism implements DynamicDisplayInformationProvider {
     final int sizeOfWorld = world.getSize();
-    private int stepsSinceSpawned = 0;
-    private int speed;
+    protected int speed;
     public boolean isAdult = false;
     public boolean isDead = false;
     protected Location burrowLocation = null;
-    protected Location myLocation;
-    protected int hunger;
     /**
      * This is Aniamals' constructor,
      * parameters World, Program and image are inhereted
@@ -31,25 +28,7 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
         this.hunger = hunger;
     }
 
-    protected int getHunger(int hunger) {
-        stepsSinceSpawned++;
-        if (world.isOnTile(this)) {
-            myLocation = world.getLocation(this);
-            world.setCurrentLocation(myLocation);
-
-            if (hunger <= 0) {
-                die();
-            }
-        }
-
-        if (stepsSinceSpawned % 5 == 0) {
-            return --hunger;
-        } else {
-            return hunger;
-        }
-    }
-
-    protected void die() {
+    public void die() {
         isDead = true;
         world.delete(this);
         Carcass carcass = new Carcass(world,p,"carcass", "fungi");
@@ -159,7 +138,7 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
 
             if (standingOn instanceof Grass) {
                 Grass standingOnGrass = (Grass) standingOn;
-                eat(standingOnGrass);
+                hunger += eat(standingOnGrass);
                 return;
             }
         } catch (IllegalArgumentException e) {
@@ -235,18 +214,5 @@ public abstract class Animal extends SpawnableObjects implements DynamicDisplayI
         } else {
             return 0;
         }
-    }
-
-    protected Object lookForClosestFood(Location myLocation){
-        Object objectOnTile;
-        for(int i = 0; i < sizeOfWorld; i++){
-            for(Location location : world.getSurroundingTiles(myLocation, i)){
-                objectOnTile = world.getTile(location);
-                if(objectOnTile instanceof Grass || objectOnTile instanceof Rabbit){
-                    return objectOnTile;
-                }
-            }
-        }
-        return null;
     }
 }

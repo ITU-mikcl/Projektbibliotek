@@ -16,7 +16,6 @@ public class Capybara extends Animal implements Actor {
     public Capybara(World world, Program p) {
         super(world, p, "small-capybar", 2, 10);
         this.friendFound = false;
-
     }
 
     public void act(World world) {
@@ -33,8 +32,8 @@ public class Capybara extends Animal implements Actor {
         if (!friendFound) {
             while (friend instanceof Capybara) {
                 friend = world.getTile(lookForBlocking(Animal.class));
-
             }
+
             friendFound = true;
         }
 

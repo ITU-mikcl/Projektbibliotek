@@ -4,12 +4,10 @@ import itumulator.executable.Program;
 import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.World;
+import packages.Organism;
 import packages.SpawnableObjects;
 
-public class Fungi extends SpawnableObjects implements Actor {
-    private int stepsSinceSpawned = 0;
-    final Location myLocation;
-    private int hunger;
+public class Fungi extends Organism implements Actor {
     private boolean hasSpread = false;
     private final String image;
 
@@ -27,16 +25,12 @@ public class Fungi extends SpawnableObjects implements Actor {
 
     @Override
     public void act(World world) {
-        stepsSinceSpawned++;
+        hunger = getHunger(hunger);
+
         if (stepsSinceSpawned >= 40 && world.isTileEmpty(myLocation) && !world.containsNonBlocking(myLocation)) {
             world.setTile(myLocation, this);
         }
-        if (hunger == 0) {
-            world.delete(this);
-        }
-        if (stepsSinceSpawned % 5 == 0 && world.isOnTile(this)) {
-            hunger--;
-        }
+
         if (foodAvailable() && !hasSpread) {
             for (Location tile : world.getSurroundingTiles(lookForCarcass())) {
                 if (world.isTileEmpty(tile)) {
@@ -48,6 +42,11 @@ public class Fungi extends SpawnableObjects implements Actor {
                 }
             }
         }
+    }
+
+    @Override
+    public void die() {
+        world.delete(this);
     }
 
     protected Location lookForCarcass() {
@@ -66,7 +65,6 @@ public class Fungi extends SpawnableObjects implements Actor {
         Location carcassLocation = lookForCarcass();
         if (carcassLocation != null) {
             carcass = (Carcass) world.getTile(lookForCarcass());
-
         }
         return carcass != null;
     }

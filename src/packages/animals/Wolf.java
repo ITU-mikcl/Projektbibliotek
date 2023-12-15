@@ -19,13 +19,13 @@ public class Wolf extends FossorialAnimals implements Actor {
     private Animal prey;
     private Carcass carcass;
     private boolean isLeader;
-    private final int myPack;
+    private final WolfPack myPack;
     String[] images = {"wolf-small", "wollfl-small-sleeping", "wolf", "wolf-sleeping"};
     Wolf newWolf = null;
     private HashMap<Wolf, Boolean> allWolvesInMyPack;
     private Wolf leader;
 
-    public Wolf(World world, Program p, boolean isLeader, int myPack) {
+    public Wolf(World world, Program p, boolean isLeader, WolfPack myPack) {
         super(world, p, "wolf-small", 2, 15);
         this.isLeader = isLeader;
         this.myPack = myPack;
@@ -59,16 +59,21 @@ public class Wolf extends FossorialAnimals implements Actor {
         if (isLeader) {
             leaderAct();
         } else {
-            if (world.isOnTile(leader)) {
-                wolfAct();
+            try {
+                if (world.isOnTile(leader)) {
+                    wolfAct();
+                }
+            } catch (IllegalArgumentException e) {
+
             }
+
         }
     }
 
     private void nightAct() {
         if (world.isOnTile(this)) {
             getToBurrow();
-        } else if (isAdult && isLeader && allWolvesInMyPack.size() >= 2 && hunger >= 5) {
+        } else if (isAdult && isLeader && allWolvesInMyPack.size() >= 2 && hunger >= 10) {
             reproduce();
         }
     }
@@ -94,8 +99,12 @@ public class Wolf extends FossorialAnimals implements Actor {
             if (carcass != null) {
                 eatCarcass();
             } else if (prey != null) {
-                if (world.isOnTile(prey)) {
-                    prey = killPrey(prey);
+                try {
+                    if (world.isOnTile(prey)) {
+                        prey = killPrey(prey);
+                    }
+                } catch (IllegalArgumentException e) {
+
                 }
             }
         }
@@ -103,7 +112,7 @@ public class Wolf extends FossorialAnimals implements Actor {
 
     private void spawnNewWolf() {
         if (newWolf != null) {
-            Spawner.spawnWolf(burrowLocation, burrowLocation.getX(), burrowLocation.getY(), Spawner.size, false);
+            Spawner.spawnWolf(burrowLocation, burrowLocation.getX(), burrowLocation.getY(), Spawner.size, false, myPack);
             newWolf = null;
         }
     }
@@ -177,6 +186,8 @@ public class Wolf extends FossorialAnimals implements Actor {
         Object tile;
         Set<Wolf> allWolves = new HashSet<>();
 
+        allWolves.add(this);
+
         for (Location targetLocation : world.getSurroundingTiles(myLocation, sizeOfWorld)) {
             tile = world.getTile(targetLocation);
             if (tile instanceof Wolf) {
@@ -221,9 +232,8 @@ public class Wolf extends FossorialAnimals implements Actor {
 
     private void reproduce() {
         newWolf = new Wolf(world, p, false, myPack);
-        Spawner.getMyWolfpack(myPack).addWolf(newWolf);
+        myPack.addWolf(newWolf);
         newWolf.burrowLocation = burrowLocation;
-        hunger -= 5;
         changeHungerForPack(-5);
     }
 }
