@@ -93,8 +93,10 @@ public class Wolf extends FossorialAnimals implements Actor {
 
             if (carcass != null) {
                 eatCarcass();
-            } else if (prey != null && world.isOnTile(prey)) {
-                prey = killPrey(prey);
+            } else if (prey != null) {
+                if (world.isOnTile(prey)) {
+                    prey = killPrey(prey);
+                }
             }
         }
     }

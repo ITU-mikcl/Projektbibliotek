@@ -34,7 +34,11 @@ public class Bear extends Animal implements Actor {
             } else if (myTerritory.contains(prey)) {
                 prey = (Rabbit) killPrey(prey);
             } else if (!eatBerries()) {
-                bearLookingForGrass();
+                if (myLocation != null) {
+                    bearLookingForGrass();
+                } else {
+                    myLocation = world.getLocation(this);
+                }
             }
         }
     }

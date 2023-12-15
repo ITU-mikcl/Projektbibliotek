@@ -5,8 +5,6 @@ import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.World;
 import packages.SpawnableObjects;
-import java.util.Set;
-import java.util.HashSet;
 
 public class Fungi extends SpawnableObjects implements Actor {
     private int stepsSinceSpawned = 0;

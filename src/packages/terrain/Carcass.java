@@ -7,6 +7,7 @@ import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.World;
 import packages.SpawnableObjects;
+import packages.terrain.Fungi;
 
 import java.awt.*;
 

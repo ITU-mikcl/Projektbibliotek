@@ -131,8 +131,8 @@ public class Spawner{
             x = rand.nextInt(size);
             y = rand.nextInt(size);
             l = new Location(x, y);
-
         }
+
         world.setTile(l, new Carcass(world,p,"carcass", "fungi"));
     }
 
