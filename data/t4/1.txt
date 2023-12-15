@@ -1,0 +1,6 @@
+12
+rabbit 2-4
+wolf 2
+bear 2
+grass 5
+capybara 3

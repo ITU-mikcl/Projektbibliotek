@@ -17,7 +17,7 @@ import packages.terrain.Fungi;
 
 public class Spawner{
     public static ArrayList<WolfPack> wolfPacks = new ArrayList<>();
-    public static HashSet<String> blockingObjects = new HashSet<>(Arrays.asList("rabbit","wolf","bear", "fungi"));
+    public static HashSet<String> blockingObjects = new HashSet<>(Arrays.asList("rabbit","wolf","bear", "fungi","capybara"));
     public static Random rand = new Random();
     public static Wolf wolfCurrent;
     public static World world;
