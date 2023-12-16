@@ -112,7 +112,7 @@ public class Wolf extends FossorialAnimals implements Actor {
 
     private void spawnNewWolf() {
         if (newWolf != null) {
-            Spawner.spawnWolf(burrowLocation, burrowLocation.getX(), burrowLocation.getY(), Spawner.size, false, myPack);
+            Spawner.spawnWolf(burrowLocation, Spawner.size, false, myPack);
             newWolf = null;
         }
     }
