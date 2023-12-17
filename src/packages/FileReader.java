@@ -4,7 +4,6 @@ import java.io.*;
 public class FileReader {
 
     public static File run() {
-        
         Scanner s = new Scanner(System.in);
         System.out.println("Indtast temanr: ");
         int themeNumber = s.nextInt();

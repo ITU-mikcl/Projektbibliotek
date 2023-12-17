@@ -33,7 +33,7 @@ public class Main {
         size = Integer.parseInt(fileValues.get(0));
 
         if (size <= 0) {
-            throw new IllegalArgumentException("World size can't be 0");
+            throw new IllegalArgumentException("World size can't be less than 1");
         }
 
         Program p = new Program(size, displaySize, delay);

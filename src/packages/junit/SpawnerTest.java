@@ -26,7 +26,7 @@ class SpawnerTest {
     }
 
     @org.junit.jupiter.api.Test
-    void worldTest() {
+    void blockingTest() {
         fileValues.add("rabbit 50\n");
         assertThrows(IllegalArgumentException.class, ()-> {
             spawner.spawnObject(fileValues);
@@ -34,9 +34,17 @@ class SpawnerTest {
     }
 
     @org.junit.jupiter.api.Test
-    void GrassTest() {
+    void nonblockingTest() {
         fileValues.add("grass 50\n");
         assertThrows(IllegalArgumentException.class, ()-> {
+            spawner.spawnObject(fileValues);
+        });
+    }
+
+    @org.junit.jupiter.api.Test
+    void classTest() {
+        fileValues.add("test 50\n");
+        assertThrows(NumberFormatException.class, ()-> {
             spawner.spawnObject(fileValues);
         });
     }

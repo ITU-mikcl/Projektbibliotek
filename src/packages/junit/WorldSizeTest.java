@@ -18,7 +18,7 @@ class WorldSizeTest {
     }
 
     @org.junit.jupiter.api.Test
-    void worldTest() {
+    void sizeTest() {
         int size = 0;
         int delay = 500;
         int displaySize = 800;

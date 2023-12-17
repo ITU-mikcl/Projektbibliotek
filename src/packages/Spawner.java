@@ -49,7 +49,7 @@ public class Spawner{
                 if (!isObjectBlocking) {
                     isObjectBlocking = Actor.class.isAssignableFrom(Class.forName( "packages.terrain." + objToSpawn));
                 }
-            } catch (ClassNotFoundException e) {
+            } catch (NumberFormatException e) {
 
             }
 

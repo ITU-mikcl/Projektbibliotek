@@ -57,15 +57,18 @@ public class Fungi extends Organism implements Actor {
                 }
             }
         }
+
         return null;
     }
 
     private boolean foodAvailable() {
         Carcass carcass = null;
         Location carcassLocation = lookForCarcass();
+
         if (carcassLocation != null) {
             carcass = (Carcass) world.getTile(lookForCarcass());
         }
+
         return carcass != null;
     }
 }
