@@ -77,8 +77,7 @@ public abstract class Animal extends Organism implements DynamicDisplayInformati
     protected Location lookForBlocking(Class<?> targetClass){
         for (int i = 1; i < sizeOfWorld; i++) {
             for (Location targetLocation : world.getSurroundingTiles(myLocation, i)) {
-                Set<Location> targetClassSurroundingTiles = world.getSurroundingTiles();
-                if (targetClass.isInstance(world.getTile(targetLocation)) && !targetClassSurroundingTiles.isEmpty()) {
+                if (targetClass.isInstance(world.getTile(targetLocation))) {
                     return targetLocation;
                 }
             }

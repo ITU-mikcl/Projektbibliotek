@@ -12,11 +12,9 @@ import java.util.Set;
 
 public class Capybara extends Animal implements Actor {
     final String[] images = {"small-capybara", "small-capybara-sleeping", "capybara", "capybara-sleeping"};
-    private boolean friendFound;
     Object friend;
     public Capybara(World world, Program p) {
         super(world, p, "small-capybara", 2, 10);
-        this.friendFound = false;
     }
 
     public void act(World world) {
@@ -32,10 +30,8 @@ public class Capybara extends Animal implements Actor {
     private void dayAct() {
         adultCheck();
 
-        if (!friendFound) {
-            friend = world.getTile(lookForFriend());
-            System.out.println(friend);
-            friendFound = true;
+        if (friend == null) {
+            friend = lookForFriend();
         }
 
         if (hunger <= 5) {
@@ -45,23 +41,23 @@ public class Capybara extends Animal implements Actor {
                 if(world.isOnTile(friend)){
                     moveToLocation(world.getLocation(friend));
                 }
-            }catch (IllegalArgumentException ignore){}
+            }catch (IllegalArgumentException e){
 
-        } else {
-            friendFound = false;
-            System.out.println("VEN DØD");
+            }
         }
     }
 
-    private Location lookForFriend(){
+    private Object lookForFriend(){
         for (int i = 1; i < sizeOfWorld; i++) {
             for (Location targetLocation : world.getSurroundingTiles(myLocation, i)) {
-                Set<Location> targetClassSurroundingTiles = world.getSurroundingTiles();
-                if (!(world.getTile(targetLocation) instanceof Capybara) && !targetClassSurroundingTiles.isEmpty()) {
-                    return targetLocation;
+                Object targetObject = world.getTile(targetLocation);
+
+                if (targetObject instanceof Animal && !(targetObject instanceof Capybara)) {
+                    return targetObject;
                 }
             }
         }
+
         return null;
     }
 
