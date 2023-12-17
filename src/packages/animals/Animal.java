@@ -41,17 +41,20 @@ public abstract class Animal extends Organism implements DynamicDisplayInformati
 
     protected void wakeUp() {
         if (!world.isOnTile(this)) {
-            if (!isAdult && stepsSinceSpawned > 60) {
-                isAdult = true;
-                speed /= 2;
-            }
-
+            adultCheck();
             Location wakeUpLocation = getEmptyTileClosestToLocation(burrowLocation);
             if (wakeUpLocation != null) {
                 world.setTile(wakeUpLocation, this);
                 myLocation = wakeUpLocation;
                 world.setCurrentLocation(wakeUpLocation);
             }
+        }
+    }
+
+    protected void adultCheck(){
+        if (!isAdult && stepsSinceSpawned > 60) {
+            isAdult = true;
+            speed /= 2;
         }
     }
 
