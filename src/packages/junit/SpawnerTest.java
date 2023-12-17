@@ -15,7 +15,7 @@ class SpawnerTest {
 
     @org.junit.jupiter.api.BeforeEach
     void setUp() {
-        int size = 5;
+        int size = 10;
         int delay = 500;
         int displaySize = 800;
         Program p = new Program(size, displaySize, delay);

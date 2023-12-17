@@ -25,19 +25,28 @@ public class FileReader {
         File directory = new File("./data");
         File[] files = directory.listFiles();
         int i = 0;
+
+        if (files.length < themeNumber) {
+            throw new NumberFormatException("Directory must exist");
+        }
+
         for (File file : files) {
             i++;
             if (i == themeNumber) {
                 i = 0;
                 for (File f : file.listFiles()) {
+                    if (file.listFiles().length < fileNumber) {
+                        throw new NumberFormatException("File must exist");
+                    }
+
                     i++;
                     if (i == fileNumber) {
                         return f;
                     }
                 }
             }
-        } return null;
+        }
+
+        return null;
     }
 }
-
-

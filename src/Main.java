@@ -14,9 +14,6 @@ public class Main {
         int displaySize = 800;
         ArrayList<String> fileValues = new ArrayList<>();
 
-
-
-
         /**
          * Calls the run method on the FileReaderClass, which handles the logic of files.
          * Fills the arraylist fileValues with files that need to be read
@@ -45,7 +42,6 @@ public class Main {
         if (size <= 0) {
             throw new IllegalArgumentException("World size can't be less than 1");
         }
-
 
         /**
          * Instantiating the world, showing and simulating it as well for 1000 steps.
