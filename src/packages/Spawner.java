@@ -25,16 +25,23 @@ public class Spawner{
     private static int yCoords = 0;
     private static boolean hasCoords = false;
 
+
     public Spawner(World world, Program p, int size) {
         Spawner.world = world;
         Spawner.p = p;
         Spawner.size = size;
     }
 
+    /**
+     *  This method spawns objects based on user input to choose the input file.
+     *  It adds all values from the input file to an ArrayList and checks
+     *  which animal it is and spawns it accordingly.
+     * @param fileValues String ArrayList with all the content in the file
+     */
     public static void spawnObject(ArrayList<String> fileValues) {
         String objToSpawn;
-        int x;
-        int y;
+        int x; //coordinate
+        int y; //coordinate
 
         for (int i = 1 ; i < fileValues.size(); i++){
             objToSpawn = fileValues.get(i).split(" ")[0];
@@ -84,6 +91,12 @@ public class Spawner{
         }
     }
 
+    /**
+     * This method finds the exact number of a specific animal to spawn
+     * from the given textfile
+     * @param fileValues String ArrayList with all content in a file
+     * @param spawnABear if true means it has to spawn a bear
+     */
     private static void getAmountToSpawn(ArrayList<String> fileValues, int i, boolean spawnABear) {
         if (fileValues.get(i).contains("-")) {
             int lowerBound = Integer.parseInt(fileValues.get(i).split(" ")[1].split("-")[0]);
@@ -106,6 +119,13 @@ public class Spawner{
         }
     }
 
+    /**
+     * This method checks if a tile on the location l is empty.
+     * If it isn't it assigns a random value for x and y and
+     * returns this new location
+     * @param l Location that will be returned as int x, y
+     * @return Location
+     */
     private static Location getEmptyTile(Location l) {
         int x;
         int y;
@@ -119,6 +139,14 @@ public class Spawner{
         return l;
     }
 
+    /**
+     * This method spawns a wolf and assigns the object to a WolfPack and decides
+     * whether it is a Leader. If the WolfPack is empty a new one will be created.
+     * @param l Location
+     * @param size
+     * @param spawnALeader if true makes the object a Leader of the WolfPack
+     * @param myWolfPack WolfPack
+     */
     public static void spawnWolf(Location l, int size, boolean spawnALeader, WolfPack myWolfPack) {
         for (int i = 1; i < size; i++) {
             for (Location targetLocation : world.getSurroundingTiles(l, i)) {
@@ -141,6 +169,12 @@ public class Spawner{
         world.setTile(l, wolfCurrent);
     }
 
+    /**
+     * This method spawns a new Bear on centerLocation if hasCoords is true
+     * else it spawns the Bear on Location l
+     * @param l Location, int x, y
+     * @param centerLocation Location
+     */
     private static void spawnBear(Location l, Location centerLocation) {
         Location myLocation = getEmptyTile(l);
 
@@ -151,6 +185,11 @@ public class Spawner{
         }
     }
 
+    /**
+     * This method spawns a new Carcass on the location MyLocation which is the
+     * closest Location that is empty
+     * @param l Location, int x, y
+     */
     private static void spawnCarcass(Location l){
         Location myLocation = getEmptyTile(l);
 
