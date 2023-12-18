@@ -10,7 +10,7 @@ import java.awt.*;
 public class Capybara extends Animal implements Actor {
     final String[] images = {"small-capybara", "small-capybara-sleeping", "capybara", "capybara-sleeping"};
     Object friend;
-    int timeToNextReproduction;
+    protected int timeToNextReproduction;
     private Object droppedFeces;
     public Capybara(World world, Program p) {
         super(world, p, "small-capybara", 2, 10);
@@ -33,12 +33,15 @@ public class Capybara extends Animal implements Actor {
         if (friend == null) {
             friend = lookForFriend();
         }
+
         if (droppedFeces != null) {
             eat(droppedFeces);
             droppedFeces = null;
-        }
-        else if (hunger <= 5) {
+        } else if (hunger < 5) {
             lookForGrass();
+        } else if (stepsSinceSpawned >= timeToNextReproduction && isAdult) {
+            timeToNextReproduction += 60;
+            reproduce("Capybara");
         } else if (friend != null){
             try{
                 if(world.isOnTile(friend)){
@@ -48,11 +51,16 @@ public class Capybara extends Animal implements Actor {
 
             }
         }
-        if (stepsSinceSpawned >= timeToNextReproduction && isAdult && hunger >= 5) {
-            timeToNextReproduction += 60;
-            reproduce("Capybara");
-        }
     }
+
+    @Override
+    protected void waitToReproduce(Animal partner) {
+        Capybara capybaraPartner = (Capybara) partner;
+
+        capybaraPartner.hunger -= 5;
+        capybaraPartner.timeToNextReproduction += 60;
+    }
+
     private void nightAct() {
         if (droppedFeces == null) {
             for (Location tile : world.getSurroundingTiles()) {

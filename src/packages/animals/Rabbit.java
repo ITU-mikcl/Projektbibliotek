@@ -48,11 +48,7 @@ public class Rabbit extends FossorialAnimals implements Actor {
 
         if (!isBeingChased){
             if (isAdult && hunger >= 5) {
-                Location partnerLocation = lookForBlocking(Rabbit.class);
-                if (partnerLocation != null){
-                    lookForPartner(partnerLocation);
-                    return;
-                }
+                reproduce("Rabbit");
             }
 
             lookForGrass();
@@ -86,18 +82,10 @@ public class Rabbit extends FossorialAnimals implements Actor {
                 tileToMoveTo = tile;
             }
         }
+
         return tileToMoveTo;
     }
 
-    private void lookForPartner(Location partnerLocation) {
-        for(Location surroundingTile : world.getSurroundingTiles()){
-            if(surroundingTile.hashCode() == partnerLocation.hashCode()){
-                reproduce("Rabbit");
-                return;
-            }
-        }
-        moveToLocation(partnerLocation);
-    }
     @Override
     public void lookForBurrow() {
         if (burrowLocation == null) {
