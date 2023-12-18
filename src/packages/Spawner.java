@@ -148,10 +148,12 @@ public class Spawner{
      * @param myWolfPack WolfPack
      */
     public static void spawnWolf(Location l, int size, boolean spawnALeader, WolfPack myWolfPack) {
+        outerloop: 
         for (int i = 1; i < size; i++) {
             for (Location targetLocation : world.getSurroundingTiles(l, i)) {
                 if (world.isTileEmpty(targetLocation)) {
                     l = targetLocation;
+                    break outerloop;
                 }
             }
         }
@@ -167,6 +169,7 @@ public class Spawner{
         wolfCurrent = new Wolf(world, p, spawnALeader, myWolfPack);
         myWolfPack.addWolf(wolfCurrent);
         world.setTile(l, wolfCurrent);
+
     }
 
     /**
