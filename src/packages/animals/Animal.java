@@ -12,6 +12,9 @@ import packages.terrain.Grass;
 import java.lang.reflect.Constructor;
 import java.util.Set;
 
+/**
+ * The Animal abstract class that handles how all animals behave. It is an extension of the Organism class.
+ */
 public abstract class Animal extends Organism implements DynamicDisplayInformationProvider, AnimalInterface {
     final int sizeOfWorld = world.getSize();
     protected int speed;
@@ -20,11 +23,11 @@ public abstract class Animal extends Organism implements DynamicDisplayInformati
     protected Location burrowLocation = null;
     public int hunger;
     /**
-     * This is Aniamals' constructor,
-     * parameters World, Program and image are inhereted
-     * from super class 'SpawnableObjects'
-     * speed and hunger are initialized in animal.
-     * @param
+     * This is the Animal class constructor that initializes a new animal
+     * with the parameters from organism with speed and hunger which is
+     * specific to an animal.
+     * @param speed integer value, determines the speed of animal
+     * @param hunger integer value that determines the hunger of an animal.
      */
     public Animal (World world, Program p, String image, int speed, int hunger){
         super(world,p,image);
@@ -32,6 +35,9 @@ public abstract class Animal extends Organism implements DynamicDisplayInformati
         this.hunger = hunger;
     }
 
+    /**
+     * The
+     */
     public void die() {
         isDead = true;
         world.delete(this);
