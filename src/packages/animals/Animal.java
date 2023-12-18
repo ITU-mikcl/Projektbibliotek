@@ -12,12 +12,13 @@ import packages.terrain.Grass;
 import java.lang.reflect.Constructor;
 import java.util.Set;
 
-public abstract class Animal extends Organism implements DynamicDisplayInformationProvider {
+public abstract class Animal extends Organism implements DynamicDisplayInformationProvider, AnimalInterface {
     final int sizeOfWorld = world.getSize();
     protected int speed;
     public boolean isAdult = false;
     public boolean isDead = false;
     protected Location burrowLocation = null;
+    public int hunger;
     /**
      * This is Aniamals' constructor,
      * parameters World, Program and image are inhereted
@@ -43,8 +44,9 @@ public abstract class Animal extends Organism implements DynamicDisplayInformati
     }
 
     protected void wakeUp() {
+        adultCheck();
+
         if (!world.isOnTile(this)) {
-            adultCheck();
             Location wakeUpLocation = getEmptyTileClosestToLocation(burrowLocation);
 
             if (wakeUpLocation != null) {
@@ -228,13 +230,46 @@ public abstract class Animal extends Organism implements DynamicDisplayInformati
         try {
             className = "packages.animals." + className;
             Class<?> objectType = Class.forName(className);
-            Constructor<?> constructor = objectType.getConstructor(World.class, Program.class);
-            Object obj = constructor.newInstance(world, p);
-            for (Location birthLocation : world.getEmptySurroundingTiles()) {
-                world.setTile(birthLocation, obj);
-                hunger -= 5;
-                break;
+
+            Location partnerLocation = lookForPartner(objectType);
+
+            if (partnerLocation != null) {
+                if (world.getSurroundingTiles().contains(partnerLocation)) {
+                    Constructor<?> constructor = objectType.getConstructor(World.class, Program.class);
+                    Object obj = constructor.newInstance(world, p);
+
+                    for (Location birthLocation : world.getEmptySurroundingTiles()) {
+                        world.setTile(birthLocation, obj);
+                        hunger -= 5;
+                        waitToReproduce((Animal) world.getTile(partnerLocation));
+                        break;
+                    }
+                } else {
+                    moveToLocation(partnerLocation);
+                }
+
             }
-        } catch (Exception e) {}
+
+        } catch (Exception e) {
+
+        }
+    }
+
+    protected void waitToReproduce(Animal partner) {
+        partner.hunger -= 5;
+    }
+
+    protected Location lookForPartner(Class<?> targetClass) {
+        for (int i = 1; i < sizeOfWorld; i++) {
+            for (Location targetLocation : world.getSurroundingTiles(myLocation, i)) {
+                if (targetClass.isInstance(world.getTile(targetLocation))
+                        && ((Animal) world.getTile(targetLocation)).isAdult
+                        && ((Animal) world.getTile(targetLocation)).hunger >= 5) {
+                    return targetLocation;
+                }
+            }
+        }
+
+        return null;
     }
 }
