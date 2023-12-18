@@ -5,6 +5,9 @@ import itumulator.world.World;
 
 import java.awt.*;
 
+/**
+ * This abstract class is the inheritance of every spawnable object.
+ */
 public abstract class SpawnableObjects {
     public Program p;
     public World world;

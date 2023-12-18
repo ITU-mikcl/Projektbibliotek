@@ -44,7 +44,7 @@ public class Main {
         }
 
         /**
-         * Instantiating the world, showing and simulating it as well for 1000 steps.
+         * Instantiating the world, showing and simulating it for 1000 steps.
          */
         Program p = new Program(size, displaySize, delay);
         World world = p.getWorld();

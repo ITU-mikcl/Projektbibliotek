@@ -12,7 +12,9 @@ import packages.animals.*;
 import packages.terrain.Carcass;
 import packages.terrain.Fungi;
 
-
+/**
+ * The Spawner class is used for spawning all entities in the Animals and Terrain package.
+ */
 public class Spawner{
     public static ArrayList<WolfPack> wolfPacks = new ArrayList<>();
     public static Random rand = new Random();
@@ -25,7 +27,12 @@ public class Spawner{
     private static int yCoords = 0;
     private static boolean hasCoords = false;
 
-
+    /**
+     * The constructor for the Spawner class initializes the class
+     * @param world World
+     * @param p Program
+     * @param size size of world
+     */
     public Spawner(World world, Program p, int size) {
         Spawner.world = world;
         Spawner.p = p;
@@ -124,7 +131,7 @@ public class Spawner{
      * If it isn't it assigns a random value for x and y and
      * returns this new location
      * @param l Location that will be returned as int x, y
-     * @return Location
+     * @return Location l
      */
     private static Location getEmptyTile(Location l) {
         int x;
@@ -143,7 +150,7 @@ public class Spawner{
      * This method spawns a wolf and assigns the object to a WolfPack and decides
      * whether it is a Leader. If the WolfPack is empty a new one will be created.
      * @param l Location
-     * @param size
+     * @param size size of world
      * @param spawnALeader if true makes the object a Leader of the WolfPack
      * @param myWolfPack WolfPack
      */
@@ -199,6 +206,10 @@ public class Spawner{
         world.setTile(myLocation, new Carcass(world,p,"carcass", "fungi"));
     }
 
+    /**
+     * This methods spawns Fungi if Location l is empty. Then the fungi is removed again so that it can spawn later.
+     * @param l Location
+     */
     private static void spawnFungi(Location l){
         Location myLocation = getEmptyTile(l);
 
@@ -207,6 +218,16 @@ public class Spawner{
         world.remove(currentFungi);
     }
 
+    /**
+     * This method is for spawning objects. It takes class in to account to figure out which animal it has to spawn.
+     * It also figures out if it's an animal by checking if it is blocking.
+     *
+     * @param className Which class - What animal or entity it is.
+     * @param world World
+     * @param p Program
+     * @param size Size of world
+     * @param isBlocking Boolean to define whether it is blocking.
+     */
     private static void spawnObject(String className, World world, Program p, int size, boolean isBlocking) {
         boolean isAnimal = false;
 
@@ -247,6 +268,11 @@ public class Spawner{
         }
     }
 
+    /**
+     * This method checks whether there is space in a given tile's location.
+     * It takes into account if the entity is blocking.
+     * @param isBlocking Boolean that defines if the entity is blocking
+     */
     public static void checkSpace(boolean isBlocking) {
         if (isBlocking) {
             for(Location tile : world.getSurroundingTiles(new Location(0,0),size)) {
