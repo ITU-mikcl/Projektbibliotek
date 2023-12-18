@@ -4,15 +4,14 @@ import itumulator.executable.Program;
 import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.World;
-import packages.terrain.Burrow;
-import packages.terrain.Carcass;
+import packages.terrain.Feces;
 
 import java.awt.*;
-import java.util.Set;
-
 public class Capybara extends Animal implements Actor {
     final String[] images = {"small-capybara", "small-capybara-sleeping", "capybara", "capybara-sleeping"};
     Object friend;
+    int timeToNextReproduction;
+    private Object droppedFeces;
     public Capybara(World world, Program p) {
         super(world, p, "small-capybara", 2, 10);
     }
@@ -23,9 +22,10 @@ public class Capybara extends Animal implements Actor {
         if (canIAct()) {
             if (world.isDay()) {
                 dayAct();
+            } else {
+                nightAct();
             }
         }
-
     }
     private void dayAct() {
         adultCheck();
@@ -33,8 +33,11 @@ public class Capybara extends Animal implements Actor {
         if (friend == null) {
             friend = lookForFriend();
         }
-
-        if (hunger <= 5) {
+        if (droppedFeces != null) {
+            eat(droppedFeces);
+            droppedFeces = null;
+        }
+        else if (hunger <= 5) {
             lookForGrass();
         } else if (friend != null){
             try{
@@ -45,8 +48,22 @@ public class Capybara extends Animal implements Actor {
 
             }
         }
+        if (stepsSinceSpawned >= timeToNextReproduction && isAdult && hunger >= 5) {
+            timeToNextReproduction += 60;
+            reproduce("Capybara");
+        }
     }
-
+    private void nightAct() {
+        if (droppedFeces == null) {
+            for (Location tile : world.getSurroundingTiles()) {
+                if (!world.containsNonBlocking(tile)) {
+                    world.setTile(tile, new Feces(world, p));
+                    droppedFeces = world.getNonBlocking(tile);
+                    break;
+                }
+            }
+        }
+    }
     private Object lookForFriend(){
         for (int i = 1; i < sizeOfWorld; i++) {
             for (Location targetLocation : world.getSurroundingTiles(myLocation, i)) {

@@ -6,8 +6,10 @@ import itumulator.world.Location;
 import itumulator.world.World;
 import packages.Organism;
 import packages.terrain.Carcass;
+import packages.terrain.Feces;
 import packages.terrain.Grass;
 
+import java.lang.reflect.Constructor;
 import java.util.Set;
 
 public abstract class Animal extends Organism implements DynamicDisplayInformationProvider {
@@ -21,6 +23,7 @@ public abstract class Animal extends Organism implements DynamicDisplayInformati
      * parameters World, Program and image are inhereted
      * from super class 'SpawnableObjects'
      * speed and hunger are initialized in animal.
+     * @param
      */
     public Animal (World world, Program p, String image, int speed, int hunger){
         super(world,p,image);
@@ -155,6 +158,8 @@ public abstract class Animal extends Organism implements DynamicDisplayInformati
         world.delete(food);
         if (food instanceof Carcass && ((Carcass) food).isBig()) {
             return 10;
+        } else if (food instanceof Feces) {
+            return 2;
         } else {
             return 5;
         }
@@ -217,5 +222,19 @@ public abstract class Animal extends Organism implements DynamicDisplayInformati
         } else {
             return 0;
         }
+    }
+
+    protected void reproduce(String className) {
+        try {
+            className = "packages.animals." + className;
+            Class<?> objectType = Class.forName(className);
+            Constructor<?> constructor = objectType.getConstructor(World.class, Program.class);
+            Object obj = constructor.newInstance(world, p);
+            for (Location birthLocation : world.getEmptySurroundingTiles()) {
+                world.setTile(birthLocation, obj);
+                hunger -= 5;
+                break;
+            }
+        } catch (Exception e) {}
     }
 }

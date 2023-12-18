@@ -19,7 +19,7 @@ public abstract class Organism extends SpawnableObjects implements OrganismInter
             myLocation = world.getLocation(this);
             world.setCurrentLocation(myLocation);
 
-            if (hunger <= 0) {
+            if (hunger <= 0 || stepsSinceSpawned >= 200) {
                 die();
             }
         }

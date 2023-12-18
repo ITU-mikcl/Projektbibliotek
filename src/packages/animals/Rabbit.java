@@ -92,21 +92,12 @@ public class Rabbit extends FossorialAnimals implements Actor {
     private void lookForPartner(Location partnerLocation) {
         for(Location surroundingTile : world.getSurroundingTiles()){
             if(surroundingTile.hashCode() == partnerLocation.hashCode()){
-                reproduce();
+                reproduce("Rabbit");
                 return;
             }
         }
         moveToLocation(partnerLocation);
     }
-
-    private void reproduce() {
-        for (Location birthLocation : world.getEmptySurroundingTiles()) {
-            world.setTile(birthLocation, new Rabbit(world, p));
-            hunger -= 5;
-            break;
-        }
-    }
-
     @Override
     public void lookForBurrow() {
         if (burrowLocation == null) {
