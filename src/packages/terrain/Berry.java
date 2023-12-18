@@ -12,7 +12,7 @@ import java.awt.*;
 public class Berry extends SpawnableObjects implements Actor, DynamicDisplayInformationProvider {
     final String[] images = {"bush", "bush-berries"};
     private int stepsSinceSpawned = 0;
-    public boolean hasBerries = false;
+    public boolean hasBerries = true;
 
     public Berry(World world, Program p) {
         super(world,p,"bush");

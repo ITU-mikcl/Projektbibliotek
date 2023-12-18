@@ -1,3 +1,13 @@
-10
-grass 4
+25
+grass 30
+rabbit 10-12
+wolf 2-4
+wolf 2-4
+wolf 2-4
+wolf 2-4
+bear 1 (5,5)
+bear 1 (17,17)
+bear 2 (12,12)
+berry 5-7
+carcass 10
 capybara 3
