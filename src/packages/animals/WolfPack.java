@@ -5,6 +5,10 @@ import itumulator.world.World;
 
 import java.util.LinkedList;
 
+/**
+ * The WolfPack class manages wolfpacks.
+ * It creates a LinkedList of the Object Wolf.
+ */
 public class WolfPack{
 
     LinkedList<Wolf> pack = new LinkedList<>();

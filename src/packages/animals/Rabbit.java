@@ -17,10 +17,23 @@ import java.awt.*;
 public class Rabbit extends FossorialAnimals implements Actor {
     boolean isBeingChased = false;
     final String[] images = {"rabbit-small", "rabbit-small-sleeping", "rabbit-large", "rabbit-sleeping"};
+
+    /**
+     * The rabbit constructor initializes a new rabbit as an animal with the
+     * rabbit small image and speed of 2 and 10 hunger.
+     * @param world World
+     * @param p Program
+     */
     public Rabbit(World world, Program p) {
         super(world, p, "rabbit-small", 2, 10);
     }
 
+    /**
+     * This method comes from the Actor interface and handles the
+     * rabbits overall behavior. It is from this method every other
+     * rabbit method is called.
+     * @param world providing details of the position on which the actor is currently located and much more.
+     */
     @Override
     public void act(World world) {
         hunger = getHunger(hunger);
@@ -34,6 +47,14 @@ public class Rabbit extends FossorialAnimals implements Actor {
         }
     }
 
+    /**
+     * This method handles the rabbits daytime behaviour.
+     * If a rabbit is in a burrow it calls wakeup.
+     * It also recognizes predator animals and moves away from them.
+     * It also calls the reproduce method if it isn't being chased and
+     * its an adult while hunger is over 5.
+     * Lastly it calls the lookforgrass method.
+     */
     private void dayAct() {
         if (burrowLocation != null) {
             wakeUp();
@@ -59,12 +80,20 @@ public class Rabbit extends FossorialAnimals implements Actor {
         }
     }
 
+    /**
+     * This method handles the rabbits nighttime behaviour whch is returning to its burrow.
+     */
     private void nightAct() {
         if (world.isOnTile(this)) {
             getToBurrow();
         }
     }
 
+    /**
+     * This method handles how the rabbit dies by deleting it.
+     * It's also responsible for spawning a carcass in its place
+     * which will later become a fungi if left to itself.
+     */
     @Override
     public void die() {
         isDead = true;
@@ -73,6 +102,13 @@ public class Rabbit extends FossorialAnimals implements Actor {
         world.setTile(myLocation,carcass);
     }
 
+    /**
+     * This method contains the logic behind how a rabbit must escape a predator.
+     * It takes a predators location as a parameter and uses the eucledian algorithm
+     * to move to a nearby tile that is further away from the predator.
+     * @param targetLocation Location of predator.
+     * @return Location of a nearby tile that is further away from the predator
+     */
     private Location nextOppositeTile(Location targetLocation) {
         double maxDistance = Double.MIN_VALUE;
         Location tileToMoveTo = myLocation;
@@ -90,6 +126,12 @@ public class Rabbit extends FossorialAnimals implements Actor {
         return tileToMoveTo;
     }
 
+    /**
+     * This method contains the logic behind how a rabbit looks for a burrow.
+     * It is also responsible for creating a new burrow if it doesn't already
+     * have one. If doesn't and it is standing on grass it will call the lookForGrass
+     * method first.
+     */
     @Override
     public void lookForBurrow() {
         if (burrowLocation == null) {
@@ -108,6 +150,10 @@ public class Rabbit extends FossorialAnimals implements Actor {
         }
     }
 
+    /**
+     * This method handles the displayinformation.
+     * @return DisplayInformation
+     */
     public DisplayInformation getInformation() {
         return new DisplayInformation(Color.white, images[getState(isOnBurrow(burrowLocation))]);
     }
