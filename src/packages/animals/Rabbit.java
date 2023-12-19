@@ -10,6 +10,10 @@ import packages.terrain.Carcass;
 
 import java.awt.*;
 
+/**
+ * The rabbit class is a fossorial animal that can act on its own.
+ * It decides how a rabbit shall act.
+ */
 public class Rabbit extends FossorialAnimals implements Actor {
     boolean isBeingChased = false;
     final String[] images = {"rabbit-small", "rabbit-small-sleeping", "rabbit-large", "rabbit-sleeping"};

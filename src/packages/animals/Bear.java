@@ -12,6 +12,9 @@ import packages.terrain.Grass;
 import java.awt.*;
 import java.util.Set;
 
+/**
+ * The Bear class is an animal that can act on its own.
+ */
 public class Bear extends Animal implements Actor {
 
     private Rabbit prey;
@@ -20,10 +23,24 @@ public class Bear extends Animal implements Actor {
     Set<Location> myTerritory;
     Carcass carcass;
     Location preyLocation, carcassLocation;
+
+    /**
+     * Initializes a new Bear.
+     * @param world World
+     * @param p Program
+     * @param myTerritory Set of its territory that the bear protects
+     */
     public Bear(World world, Program p, Set<Location> myTerritory){
         super(world, p, "bear-small", 2, 10);
         this.myTerritory = myTerritory;
     }
+
+    /**
+     * This method can be used by everything (main)
+     * It handles how the bear acts and calls all functions that
+     * dictate the bears behaviour.
+     * @param world World
+     */
     public void act(World world){
         hunger = getHunger(hunger);
 
@@ -55,6 +72,11 @@ public class Bear extends Animal implements Actor {
         }
     }
 
+    /**
+     * This method allows a bear to eat berries if there are any.
+     * It also updates the hunger value of the bear after eating berries.
+     * @return boolean value, if true the bear will either eat the berry or move towards the bush
+     */
     private boolean eatBerries() {
         Location targetBushLocation = lookForBlocking(Berry.class);
 
@@ -73,6 +95,11 @@ public class Bear extends Animal implements Actor {
         return false;
     }
 
+    /**
+     * This method allows a bear to eat a carcass.
+     * It also updates the hunger after successfully eating one.
+     * If it isn't already nearby it will find and move to the carcass location.
+     */
     private void eatCarcass() {
         if (world.getSurroundingTiles().contains(carcassLocation)) {
             hunger += (eat(carcass));
@@ -82,6 +109,11 @@ public class Bear extends Animal implements Actor {
         }
     }
 
+    /**
+     * this method allows a bear to eat grass if there is any.
+     * if it is standing on grass it will eat it and update the hunger
+     * accordingly. If not it will find and move to grass somewhere on the map.
+     */
     private void bearLookingForGrass() {
         try {
             Object standingOn = world.getNonBlocking(world.getLocation(this));
@@ -97,7 +129,14 @@ public class Bear extends Animal implements Actor {
         }
     }
 
-    protected Location lookForNonBlockingInMyTerritory(Class<?> targetClass) {
+    /**
+     * This method makes a bear look for any nonblocking object in its territory.
+     * In this method a class of the object must be specified as a parameter.
+     * If the specified object is anywhere in the bears territory it will return its location.
+     * @param targetClass Classname of object the bear wants to find.
+     * @return Location of target object (If in its territory) else null
+     */
+    private Location lookForNonBlockingInMyTerritory(Class<?> targetClass) {
         for (int i = 1; i < sizeOfWorld; i++) {
             for (Location targetLocation : world.getSurroundingTiles(myLocation, i)) {
                 if (world.containsNonBlocking(targetLocation)
@@ -111,6 +150,15 @@ public class Bear extends Animal implements Actor {
         return null;
     }
 
+    /**
+     * This method is used to get the state of the bear.
+     * The different states define what picture of the bear
+     * must be used. Value 0 means the animal is small and awake.
+     * 1 means it is small and sleeping.
+     * 2 means it's an adult and awake and 3 adult and sleeping.
+     *
+     * @return integer value defining which state the bear is in.
+     */
     protected int getState() {
         if(isAdult) {
             if (world.isNight()) {
@@ -125,6 +173,10 @@ public class Bear extends Animal implements Actor {
         }
     }
 
+    /**
+     * This method is for how the bear is displayed and what state it is in.
+     * @return DisplayInformation
+     */
     public DisplayInformation getInformation() {
         return new DisplayInformation(Color.white, images[getState()]);
     }
