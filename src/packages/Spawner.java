@@ -40,9 +40,9 @@ public class Spawner{
     }
 
     /**
-     *  This method spawns objects based on user input to choose the input file.
-     *  It adds all values from the input file to an ArrayList and checks
-     *  which animal it is and spawns it accordingly.
+     *  This method spawns objects to the world.
+     *  The objects to spawn are specified by user input.
+     *
      * @param fileValues String ArrayList with all the content in the file
      */
     public static void spawnObject(ArrayList<String> fileValues) {
