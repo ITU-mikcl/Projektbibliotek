@@ -5,14 +5,14 @@ import itumulator.executable.DynamicDisplayInformationProvider;
 import itumulator.executable.Program;
 import itumulator.simulator.Actor;
 import itumulator.world.World;
-import packages.SpawnableObjects;
+import packages.SpawnableObject;
 
 import java.awt.*;
 
 /**
  * A berry is a Spawnable Object that implements the Actor interface.
  */
-public class Berry extends SpawnableObjects implements Actor, DynamicDisplayInformationProvider {
+public class Berry extends SpawnableObject implements Actor, DynamicDisplayInformationProvider {
     final String[] images = {"bush", "bush-berries"};
     private int stepsSinceSpawned = 0;
     public boolean hasBerries = true;

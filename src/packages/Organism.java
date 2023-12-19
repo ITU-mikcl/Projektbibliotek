@@ -8,7 +8,7 @@ import itumulator.world.World;
  * This abstract class extends SpawnableObjects and Implements the OrganismInterface. It is
  * responsible for managing the hunger and Location of an entity.
  */
-public abstract class Organism extends SpawnableObjects implements OrganismInterface{
+public abstract class Organism extends SpawnableObject implements OrganismInterface{
     protected int stepsSinceSpawned = 0;
     protected Location myLocation;
     protected int hunger;

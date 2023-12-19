@@ -4,17 +4,13 @@ import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.NonBlocking;
 import itumulator.world.World;
-import packages.SpawnableObjects;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import packages.SpawnableObject;
 
 /**
  * The Grass class is a nonblocking spawnable object that can act on its own
  * Grass can grow more grass and be eaten by other animals.
  */
-public class Grass extends SpawnableObjects implements NonBlocking, Actor {
+public class Grass extends SpawnableObject implements NonBlocking, Actor {
     /**
      * The Grass constructor initializes grass a new spawnable object with the image "grass"
      * @param world world

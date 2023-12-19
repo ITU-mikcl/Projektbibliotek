@@ -5,7 +5,6 @@ import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.World;
 import packages.Organism;
-import packages.SpawnableObjects;
 
 /**
  * The Fungi class is an organism that can act on its own.

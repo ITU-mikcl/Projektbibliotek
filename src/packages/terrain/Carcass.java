@@ -6,15 +6,14 @@ import itumulator.executable.Program;
 import itumulator.simulator.Actor;
 import itumulator.world.Location;
 import itumulator.world.World;
-import packages.SpawnableObjects;
-import packages.terrain.Fungi;
+import packages.SpawnableObject;
 
 import java.awt.*;
 
 /**
  * This class is responsible for handling a Carcass. The class is a SpawnableObject and implements actor.
  */
-public class Carcass extends SpawnableObjects implements Actor, DynamicDisplayInformationProvider {
+public class Carcass extends SpawnableObject implements Actor, DynamicDisplayInformationProvider {
     int stepsSinceSpawned;
     String carcassImage;
     String fungiImage;
