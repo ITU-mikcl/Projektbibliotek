@@ -3,9 +3,9 @@ import itumulator.executable.Program;
 import itumulator.world.Location;
 import itumulator.world.World;
 import packages.Spawner;
+import packages.animals.Capybara;
 import packages.animals.Rabbit;
-import packages.terrain.Burrow;
-import packages.terrain.Grass;
+import packages.terrain.*;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -107,5 +107,97 @@ class SimulatoinTest {
         int count = countEnitties(Rabbit.class);
 
         assertEquals(0, count);
+    }
+
+    @org.junit.jupiter.api.Test
+    void carcassSpawnTest() {
+        fileValues.add("rabbit 1");
+
+        spawner.spawnObject(fileValues);
+
+        for (int i = 0; i < 120; i++) {
+            p.simulate();
+        }
+
+        int count = countEnitties(Carcass.class);
+
+        assertEquals(1, count);
+    }
+
+    @org.junit.jupiter.api.Test
+    void carcassDeathTest() {
+        fileValues.add("rabbit 1");
+
+        spawner.spawnObject(fileValues);
+
+        for (int i = 0; i < 200; i++) {
+            p.simulate();
+        }
+
+        int count = countEnitties(Carcass.class);
+
+        assertEquals(0, count);
+    }
+
+    @org.junit.jupiter.api.Test
+    void fungiSpawnTest() {
+        fileValues.add("rabbit 1");
+
+        spawner.spawnObject(fileValues);
+
+        for (int i = 0; i < 200; i++) {
+            p.simulate();
+        }
+
+        int count = countEnitties(Fungi.class);
+
+        assertEquals(1, count);
+    }
+
+    @org.junit.jupiter.api.Test
+    void caybaraEatTest() {
+        fileValues.add("capybara 4");
+        fileValues.add("grass 1");
+
+        spawner.spawnObject(fileValues);
+
+        for (int i = 0; i < 80; i++) {
+            p.simulate();
+        }
+
+        int count = countEnitties(Grass.class);
+
+        assertEquals(0, count);
+    }
+
+    @org.junit.jupiter.api.Test
+    void caybaraFecesTest() {
+        fileValues.add("capybara 1");
+
+        spawner.spawnObject(fileValues);
+
+        for (int i = 0; i < 12; i++) {
+            p.simulate();
+        }
+
+        int count = countEnitties(Feces.class);
+
+        assertEquals(1, count);
+    }
+
+    @org.junit.jupiter.api.Test
+    void caybaraReproduceTest() {
+        fileValues.add("capybara 2");
+        fileValues.add("grass 4");
+
+        spawner.spawnObject(fileValues);
+
+        for (int i = 0; i < 80; i++) {
+            p.simulate();
+        }
+
+        int count = countEnitties(Capybara.class);
+
+        assertEquals(4, count);
     }
 }

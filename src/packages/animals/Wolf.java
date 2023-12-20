@@ -58,8 +58,6 @@ public class Wolf extends FossorialAnimals implements Actor {
      */
     public void act(World world) {
         hunger = getHunger(hunger);
-        System.out.println("GET ALL WOLVES: "+getAllWolves());
-        System.out.println("In pack: "+getAllWolvesInMyPack());
 
         if (canIAct()) {
             if (world.isDay()) {
